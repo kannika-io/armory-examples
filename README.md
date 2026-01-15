@@ -35,7 +35,7 @@ For detailed instructions, see [SETUP.md](SETUP.md).
 - [Kannika Documentation](https://docs.kannika.io/)
 - [Kannika Installation Guide](https://docs.kannika.io/installation/)
 
-## Kafka Migration Setup
+## Kafka Setup
 
 To set up two Kafka clusters for testing migrations, see [KAFKA.md](KAFKA.md).
 
@@ -43,7 +43,7 @@ To set up two Kafka clusters for testing migrations, see [KAFKA.md](KAFKA.md).
 # Start the Kafka clusters
 docker compose up -d
 
-# Connect your Kind cluster to the Kafka network (optional)
+# Connect your Kind cluster to the Kafka network
 ./connect-kafka-to-kind.sh
 ```
 

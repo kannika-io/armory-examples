@@ -10,7 +10,7 @@ The `docker-compose.yml` file sets up:
 - **kafka-ui-source**: Web console for source cluster (http://localhost:8080)
 - **kafka-ui-target**: Web console for target cluster (http://localhost:8081)
 
-Both clusters use Kafka KRaft mode (no ZooKeeper required) and are connected via the `kafka-migration` Docker network.
+Both clusters use Kafka KRaft mode (no ZooKeeper required) and are connected via the `kafka` Docker network.
 
 ## Quick Start
 
@@ -92,29 +92,23 @@ To allow your Kind cluster to access the Kafka clusters, use the provided script
 ./connect-kafka-to-kind.sh
 ```
 
-This script will:
-- Check that Docker and the Kafka network are running
-- Find the Kind cluster control plane container
-- Connect it to the kafka-migration network
-- Verify the connection
-
 ### Manual Connection (Alternative)
 
 If you prefer to connect manually or need to connect a different Kind cluster:
 
 ### 1. Connect Kind Network to Kafka Network
 
-First, find your Kind cluster's network and connect it to the kafka-migration network:
+First, find your Kind cluster's network and connect it to the kafka network:
 
 ```bash
 # Find the Kind cluster network
 docker network ls | grep kind
 
-# Connect the Kind control plane to kafka-migration network
-docker network connect kafka-migration <kind-control-plane-container>
+# Connect the Kind control plane to kafka network
+docker network connect kafka <kind-control-plane-container>
 
 # For default setup, this would typically be:
-docker network connect kafka-migration kannika-kind-control-plane
+docker network connect kafka kannika-kind-control-plane
 ```
 
 ### 2. Access Kafka from Pods
@@ -164,7 +158,7 @@ kafka-topics --bootstrap-server kafka-target:29092 --list
                             │
                             │
 ┌─────────────────────────────────────────────────────────────┐
-│ Docker Network: kafka-migration                             │
+│ Docker Network: kafka                             │
 │                                                              │
 │  ┌─────────────────┐              ┌─────────────────┐      │
 │  │  kafka-source   │              │  kafka-target   │      │
@@ -197,12 +191,6 @@ kafka-topics --bootstrap-server kafka-target:29092 --list
 - **External Address**: `localhost:9093`
 - **UI Console**: http://localhost:8081
 - **Data Volume**: `kafka-target-data`
-
-### Key Features
-- **KRaft Mode**: No ZooKeeper dependency
-- **Persistent Storage**: Data persists across container restarts
-- **Dual Network Access**: Both localhost and Docker network connectivity
-- **Web UI**: Visual management and monitoring
 
 ## Managing the Environment
 
@@ -261,12 +249,12 @@ docker-compose restart kafka-source
 
 1. Verify network connection:
    ```bash
-   docker network inspect kafka-migration
+   docker network inspect kafka
    ```
 
 2. Ensure the Kind control plane is connected:
    ```bash
-   docker inspect <kind-control-plane-container> | grep kafka-migration
+   docker inspect <kind-control-plane-container> | grep kafka
    ```
 
 3. Test DNS resolution from a pod:
@@ -288,22 +276,6 @@ docker-compose restart kafka-source
    ```
 
 ## Advanced Usage
-
-### Custom Configuration
-
-You can customize the setup by editing `docker-compose.yml`:
-
-- Change ports to avoid conflicts
-- Adjust resource limits
-- Add more brokers for multi-node clusters
-- Configure additional Kafka settings
-
-### Multiple Brokers
-
-To add more brokers to either cluster, duplicate the service configuration and adjust:
-- `KAFKA_NODE_ID`
-- Port mappings
-- `KAFKA_CONTROLLER_QUORUM_VOTERS`
 
 ### Integration with Kannika Armory
 

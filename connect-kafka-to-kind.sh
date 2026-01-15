@@ -23,7 +23,7 @@ print_error() {
 
 # Configuration
 CLUSTER_NAME="${CLUSTER_NAME:-kannika-kind}"
-KAFKA_NETWORK="kafka-migration"
+KAFKA_NETWORK="kafka"
 
 # Print usage
 usage() {
@@ -34,6 +34,12 @@ Connect a Kind cluster to the Kafka migration network.
 
 This allows pods running in the Kind cluster to access the Kafka clusters
 at kafka-source:29092 and kafka-target:29092.
+
+This script will:
+  - Check that Docker and the Kafka network are running
+  - Find the Kind cluster control plane container
+  - Connect it to the kafka network
+  - Verify the connection
 
 OPTIONS:
     -h, --help              Show this help message

@@ -24,7 +24,7 @@ services:
     volumes:
       - kafka-source-data:/var/lib/kafka/data
     networks:
-      - kafka-migration
+      - kafka
 
   # Source Kafka UI Console
   kafka-ui-source:
@@ -39,7 +39,7 @@ services:
     depends_on:
       - kafka-source
     networks:
-      - kafka-migration
+      - kafka
 
   # Target Kafka Cluster
   kafka-target:
@@ -66,7 +66,7 @@ services:
     volumes:
       - kafka-target-data:/var/lib/kafka/data
     networks:
-      - kafka-migration
+      - kafka
 
   # Target Kafka UI Console
   kafka-ui-target:
@@ -81,12 +81,12 @@ services:
     depends_on:
       - kafka-target
     networks:
-      - kafka-migration
+      - kafka
 
 networks:
-  kafka-migration:
+  kafka:
     driver: bridge
-    name: kafka-migration
+    name: kafka
 
 volumes:
   kafka-source-data:
