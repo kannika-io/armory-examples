@@ -161,7 +161,11 @@ kubectl cluster-info
 
 ### Adding a License Later
 
-If you didn't provide a license during setup, you can add it later:
+If you didn't provide a license during setup, you can add it later.
+
+To get a free license, visit: https://www.kannika.io/free-trial
+
+Once you have a license file, create the secret:
 
 ```bash
 kubectl create secret generic kannika-license \
