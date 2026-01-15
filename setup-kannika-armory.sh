@@ -151,7 +151,6 @@ install_kannika_armory() {
     print_info "Installing Kannika Armory (version ${KANNIKA_VERSION})..."
     
     helm install kannika oci://quay.io/kannika/charts/kannika \
-        --create-namespace \
         --namespace "${KANNIKA_NAMESPACE}" \
         --version "${KANNIKA_VERSION}" \
         --wait
@@ -232,18 +231,34 @@ parse_args() {
                 exit 0
                 ;;
             -c|--cluster)
+                if [ -z "$2" ] || [[ "$2" == -* ]]; then
+                    print_error "Option --cluster requires a value"
+                    exit 1
+                fi
                 CLUSTER_NAME="$2"
                 shift 2
                 ;;
             -v|--version)
+                if [ -z "$2" ] || [[ "$2" == -* ]]; then
+                    print_error "Option --version requires a value"
+                    exit 1
+                fi
                 KANNIKA_VERSION="$2"
                 shift 2
                 ;;
             -n|--namespace)
+                if [ -z "$2" ] || [[ "$2" == -* ]]; then
+                    print_error "Option --namespace requires a value"
+                    exit 1
+                fi
                 KANNIKA_NAMESPACE="$2"
                 shift 2
                 ;;
             -l|--license)
+                if [ -z "$2" ] || [[ "$2" == -* ]]; then
+                    print_error "Option --license requires a value"
+                    exit 1
+                fi
                 LICENSE_PATH="$2"
                 shift 2
                 ;;

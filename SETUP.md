@@ -225,7 +225,6 @@ To customize Kannika installation, you can modify the script's `install_kannika_
 
 ```bash
 helm install kannika oci://quay.io/kannika/charts/kannika \
-  --create-namespace \
   --namespace "${KANNIKA_NAMESPACE}" \
   --version "${KANNIKA_VERSION}" \
   --set key=value \
