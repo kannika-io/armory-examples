@@ -20,6 +20,7 @@ For detailed instructions, see [SETUP.md](SETUP.md).
 - **SETUP.md** - Comprehensive guide for setting up and using Kannika Armory locally
 - **docker-compose.yml** - Two Kafka clusters setup for simulating migrations
 - **KAFKA.md** - Guide for using the Kafka migration environment
+- **connect-kafka-to-kind.sh** - Script to connect Kind cluster to Kafka network
 - **scripts/** - Optional installation scripts for kind, kubectl, and helm
 
 ## Prerequisites
@@ -39,6 +40,10 @@ For detailed instructions, see [SETUP.md](SETUP.md).
 To set up two Kafka clusters for testing migrations, see [KAFKA.md](KAFKA.md).
 
 ```bash
-docker-compose up -d
+# Start the Kafka clusters
+docker compose up -d
+
+# Connect your Kind cluster to the Kafka network (optional)
+./connect-kafka-to-kind.sh
 ```
 
