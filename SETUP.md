@@ -74,8 +74,11 @@ This will:
 # Specific Kannika version
 ./setup-kannika-armory.sh --version 0.13.0
 
-# Custom namespace
+# Custom system namespace
 ./setup-kannika-armory.sh --namespace my-namespace
+
+# With data namespace (for resource isolation)
+./setup-kannika-armory.sh --data-namespace kannika-data
 
 # With license file
 ./setup-kannika-armory.sh --license /path/to/license.key
@@ -84,7 +87,8 @@ This will:
 ./setup-kannika-armory.sh \
   --cluster production-kind \
   --version 0.13.0 \
-  --namespace kannika \
+  --namespace kannika-system \
+  --data-namespace kannika-data \
   --license ./kannika-license.key
 ```
 
@@ -95,6 +99,7 @@ This will:
 export CLUSTER_NAME=my-cluster
 export KANNIKA_VERSION=0.13.0
 export KANNIKA_NAMESPACE=kannika-system
+export KANNIKA_DATA_NAMESPACE=kannika-data
 export LICENSE_PATH=/path/to/license.key
 
 # Run the script
@@ -107,9 +112,19 @@ export LICENSE_PATH=/path/to/license.key
 |--------|---------------------|---------|-------------|
 | `--cluster`, `-c` | `CLUSTER_NAME` | `kannika-kind` | Name of the kind cluster to create |
 | `--version`, `-v` | `KANNIKA_VERSION` | `0.13.0` | Version of Kannika Armory to install |
-| `--namespace`, `-n` | `KANNIKA_NAMESPACE` | `kannika-system` | Kubernetes namespace for Kannika |
+| `--namespace`, `-n` | `KANNIKA_NAMESPACE` | `kannika-system` | Kubernetes namespace for Kannika system components |
+| `--data-namespace`, `-d` | `KANNIKA_DATA_NAMESPACE` | (none) | Kubernetes namespace for Kannika data resources |
 | `--license`, `-l` | `LICENSE_PATH` | (none) | Path to Kannika license file |
 | `--help`, `-h` | - | - | Show help message |
+
+### Understanding Namespaces
+
+Kannika uses two types of namespaces:
+
+- **System Namespace** (`--namespace`): Where Kannika Armory components (API, Console, Operator) are installed. Default: `kannika-system`
+- **Data/Resource Namespace** (`--data-namespace`): Optional namespace where your backup resources and data are managed. This provides isolation between system components and user resources.
+
+For more information about namespaces, see the [Kannika namespace documentation](https://docs.kannika.io/installation/configuration/namespaces/#resource-namespace).
 
 ## What the Script Does
 
@@ -119,13 +134,15 @@ export LICENSE_PATH=/path/to/license.key
 
 3. **Install Kannika CRDs**: Installs Kannika Custom Resource Definitions using Helm.
 
-4. **Create Namespace**: Creates the Kannika namespace in the cluster.
+4. **Create Namespace**: Creates the Kannika system namespace in the cluster.
 
-5. **Create License Secret** (optional): If a license path is provided, creates a Kubernetes secret with the license.
+5. **Create Data Namespace** (optional): If a data namespace is specified, creates the namespace for Kannika resources.
 
-6. **Install Kannika Armory**: Installs Kannika Armory using Helm.
+6. **Create License Secret** (optional): If a license path is provided, creates a Kubernetes secret with the license.
 
-7. **Verify Installation**: Checks that all deployments are running correctly.
+7. **Install Kannika Armory**: Installs Kannika Armory using Helm.
+
+8. **Verify Installation**: Checks that all deployments are running correctly.
 
 ## Expected Output
 

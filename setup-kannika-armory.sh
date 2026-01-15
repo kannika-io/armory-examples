@@ -12,6 +12,7 @@ NC='\033[0m' # No Color
 CLUSTER_NAME="${CLUSTER_NAME:-kannika-kind}"
 KANNIKA_VERSION="${KANNIKA_VERSION:-0.13.0}"
 KANNIKA_NAMESPACE="${KANNIKA_NAMESPACE:-kannika-system}"
+KANNIKA_DATA_NAMESPACE="${KANNIKA_DATA_NAMESPACE:-}"
 LICENSE_PATH="${LICENSE_PATH:-}"
 
 # Print colored message
@@ -126,13 +127,30 @@ install_kannika_crds() {
 
 # Create Kannika namespace
 create_kannika_namespace() {
-    print_info "Creating Kannika namespace: ${KANNIKA_NAMESPACE}..."
+    print_info "Creating Kannika system namespace: ${KANNIKA_NAMESPACE}..."
     
     if kubectl get namespace "${KANNIKA_NAMESPACE}" >/dev/null 2>&1; then
         print_warning "Namespace '${KANNIKA_NAMESPACE}' already exists. Skipping creation."
     else
         kubectl create namespace "${KANNIKA_NAMESPACE}"
-        print_info "Namespace created successfully!"
+        print_info "System namespace created successfully!"
+    fi
+}
+
+# Create Kannika data namespace
+create_kannika_data_namespace() {
+    if [ -z "${KANNIKA_DATA_NAMESPACE}" ]; then
+        print_info "No data namespace specified. Skipping data namespace creation."
+        return 0
+    fi
+    
+    print_info "Creating Kannika data namespace: ${KANNIKA_DATA_NAMESPACE}..."
+    
+    if kubectl get namespace "${KANNIKA_DATA_NAMESPACE}" >/dev/null 2>&1; then
+        print_warning "Namespace '${KANNIKA_DATA_NAMESPACE}' already exists. Skipping creation."
+    else
+        kubectl create namespace "${KANNIKA_DATA_NAMESPACE}"
+        print_info "Data namespace created successfully!"
     fi
 }
 
@@ -218,17 +236,19 @@ Usage: $0 [OPTIONS]
 Setup Kannika Armory on a kind cluster.
 
 OPTIONS:
-    -h, --help              Show this help message
-    -c, --cluster NAME      Kind cluster name (default: kannika-kind)
-    -v, --version VERSION   Kannika version to install (default: 0.13.0)
-    -n, --namespace NS      Kubernetes namespace for Kannika (default: kannika-system)
-    -l, --license PATH      Path to license file (optional)
+    -h, --help                 Show this help message
+    -c, --cluster NAME         Kind cluster name (default: kannika-kind)
+    -v, --version VERSION      Kannika version to install (default: 0.13.0)
+    -n, --namespace NS         Kubernetes namespace for Kannika system (default: kannika-system)
+    -d, --data-namespace NS    Kubernetes namespace for Kannika data resources (optional)
+    -l, --license PATH         Path to license file (optional)
 
 ENVIRONMENT VARIABLES:
-    CLUSTER_NAME            Same as --cluster
-    KANNIKA_VERSION         Same as --version
-    KANNIKA_NAMESPACE       Same as --namespace
-    LICENSE_PATH            Same as --license
+    CLUSTER_NAME               Same as --cluster
+    KANNIKA_VERSION            Same as --version
+    KANNIKA_NAMESPACE          Same as --namespace
+    KANNIKA_DATA_NAMESPACE     Same as --data-namespace
+    LICENSE_PATH               Same as --license
 
 EXAMPLES:
     # Basic installation
@@ -236,6 +256,9 @@ EXAMPLES:
 
     # Custom cluster name and version
     $0 --cluster my-cluster --version 0.13.0
+
+    # With data namespace
+    $0 --data-namespace kannika-data
 
     # With license file
     $0 --license /path/to/license.key
@@ -286,6 +309,14 @@ parse_args() {
                 LICENSE_PATH="$2"
                 shift 2
                 ;;
+            -d|--data-namespace)
+                if [ -z "$2" ] || [[ "$2" == -* ]]; then
+                    print_error "Option --data-namespace requires a value"
+                    exit 1
+                fi
+                KANNIKA_DATA_NAMESPACE="$2"
+                shift 2
+                ;;
             *)
                 print_error "Unknown option: $1"
                 usage
@@ -305,7 +336,8 @@ main() {
     echo "Configuration:"
     echo "  Cluster name: ${CLUSTER_NAME}"
     echo "  Kannika version: ${KANNIKA_VERSION}"
-    echo "  Namespace: ${KANNIKA_NAMESPACE}"
+    echo "  System namespace: ${KANNIKA_NAMESPACE}"
+    echo "  Data namespace: ${KANNIKA_DATA_NAMESPACE:-<not provided>}"
     echo "  License path: ${LICENSE_PATH:-<not provided>}"
     echo ""
     
@@ -313,6 +345,7 @@ main() {
     create_kind_cluster
     install_kannika_crds
     create_kannika_namespace
+    create_kannika_data_namespace
     create_license_secret
     install_kannika_armory
     verify_installation
