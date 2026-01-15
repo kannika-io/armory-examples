@@ -18,6 +18,8 @@ For detailed instructions, see [SETUP.md](SETUP.md).
 
 - **setup-kannika-armory.sh** - Automated setup script for installing Kannika Armory on a kind cluster
 - **SETUP.md** - Comprehensive guide for setting up and using Kannika Armory locally
+- **docker-compose.yml** - Two Kafka clusters setup for simulating migrations
+- **KAFKA.md** - Guide for using the Kafka migration environment
 - **scripts/** - Optional installation scripts for kind, kubectl, and helm
 
 ## Prerequisites
@@ -31,4 +33,12 @@ For detailed instructions, see [SETUP.md](SETUP.md).
 
 - [Kannika Documentation](https://docs.kannika.io/)
 - [Kannika Installation Guide](https://docs.kannika.io/installation/)
+
+## Kafka Migration Setup
+
+To set up two Kafka clusters for testing migrations, see [KAFKA.md](KAFKA.md).
+
+```bash
+docker-compose up -d
+```
 
