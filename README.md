@@ -18,16 +18,16 @@ For detailed instructions, see [SETUP.md](SETUP.md).
 
 - **setup-kannika-armory.sh** - Automated setup script for installing Kannika Armory on a kind cluster
 - **SETUP.md** - Comprehensive guide for setting up and using Kannika Armory locally
+- **scripts/** - Optional installation scripts for kind, kubectl, and helm
 
 ## Prerequisites
 
 - Docker
-- kind
-- kubectl (v1.28+)
-- helm (v3.9+)
+- kind (or use `./scripts/install-kind.sh`)
+- kubectl v1.28+ (or use `./scripts/install-kubectl.sh`)
+- helm v3.9+ (or use `./scripts/install-helm.sh`)
 
 ## Resources
 
 - [Kannika Documentation](https://docs.kannika.io/)
 - [Kannika Installation Guide](https://docs.kannika.io/installation/)
-- [GitHub: cymo-eu/kannika-platform](https://github.com/cymo-eu/kannika-platform)

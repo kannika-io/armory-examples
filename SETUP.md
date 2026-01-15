@@ -12,15 +12,35 @@ Before running the setup script, ensure you have the following tools installed:
 
 2. **kind** - Kubernetes IN Docker
    - [Installation Guide](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+   - Or use the provided script: `./scripts/install-kind.sh`
    - Verify: `kind --version`
 
 3. **kubectl** - Kubernetes command-line tool (v1.28+)
    - [Installation Guide](https://kubernetes.io/docs/tasks/tools/)
+   - Or use the provided script: `./scripts/install-kubectl.sh`
    - Verify: `kubectl version --client`
 
 4. **helm** - Kubernetes package manager (v3.9+)
    - [Installation Guide](https://helm.sh/docs/intro/install/)
+   - Or use the provided script: `./scripts/install-helm.sh`
    - Verify: `helm version`
+
+### Installing Prerequisites Locally
+
+For convenience, this repository includes optional installation scripts that will install `kind`, `kubectl`, and `helm` to a local `.bin` directory (which is git-ignored). This allows you to use these tools without requiring system-wide installation or administrator privileges.
+
+```bash
+# Install kind locally
+./scripts/install-kind.sh
+
+# Install kubectl locally
+./scripts/install-kubectl.sh
+
+# Install helm locally
+./scripts/install-helm.sh
+```
+
+The setup script will automatically detect and use tools from the `.bin` directory if they exist.
 
 ## Quick Start
 
@@ -32,9 +52,9 @@ The simplest way to set up Kannika Armory:
 
 This will:
 1. Create a kind cluster named `kannika-kind`
-2. Install Kannika CRDs version 0.12.4
+2. Install Kannika CRDs version 0.13.0
 3. Create the `kannika-system` namespace
-4. Install Kannika Armory version 0.12.4
+4. Install Kannika Armory version 0.13.0
 5. Verify the installation
 
 ## Usage
@@ -52,7 +72,7 @@ This will:
 ./setup-kannika-armory.sh --cluster my-kannika-cluster
 
 # Specific Kannika version
-./setup-kannika-armory.sh --version 0.12.4
+./setup-kannika-armory.sh --version 0.13.0
 
 # Custom namespace
 ./setup-kannika-armory.sh --namespace my-namespace
@@ -63,7 +83,7 @@ This will:
 # Combine multiple options
 ./setup-kannika-armory.sh \
   --cluster production-kind \
-  --version 0.12.4 \
+  --version 0.13.0 \
   --namespace kannika \
   --license ./kannika-license.key
 ```
@@ -73,7 +93,7 @@ This will:
 ```bash
 # Set environment variables
 export CLUSTER_NAME=my-cluster
-export KANNIKA_VERSION=0.12.4
+export KANNIKA_VERSION=0.13.0
 export KANNIKA_NAMESPACE=kannika-system
 export LICENSE_PATH=/path/to/license.key
 
@@ -86,7 +106,7 @@ export LICENSE_PATH=/path/to/license.key
 | Option | Environment Variable | Default | Description |
 |--------|---------------------|---------|-------------|
 | `--cluster`, `-c` | `CLUSTER_NAME` | `kannika-kind` | Name of the kind cluster to create |
-| `--version`, `-v` | `KANNIKA_VERSION` | `0.12.4` | Version of Kannika Armory to install |
+| `--version`, `-v` | `KANNIKA_VERSION` | `0.13.0` | Version of Kannika Armory to install |
 | `--namespace`, `-n` | `KANNIKA_NAMESPACE` | `kannika-system` | Kubernetes namespace for Kannika |
 | `--license`, `-l` | `LICENSE_PATH` | (none) | Path to Kannika license file |
 | `--help`, `-h` | - | - | Show help message |

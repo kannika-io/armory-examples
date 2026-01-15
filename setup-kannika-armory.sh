@@ -10,7 +10,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 CLUSTER_NAME="${CLUSTER_NAME:-kannika-kind}"
-KANNIKA_VERSION="${KANNIKA_VERSION:-0.12.4}"
+KANNIKA_VERSION="${KANNIKA_VERSION:-0.13.0}"
 KANNIKA_NAMESPACE="${KANNIKA_NAMESPACE:-kannika-system}"
 LICENSE_PATH="${LICENSE_PATH:-}"
 
@@ -26,6 +26,15 @@ print_warning() {
 print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
+
+# Get the script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN_DIR="${SCRIPT_DIR}/.bin"
+
+# Add local bin directory to PATH if it exists
+if [ -d "${BIN_DIR}" ]; then
+    export PATH="${BIN_DIR}:${PATH}"
+fi
 
 # Check if a command exists
 command_exists() {
@@ -59,6 +68,15 @@ check_prerequisites() {
         echo ""
         echo "Please install the missing tools:"
         echo "  - Docker: https://docs.docker.com/get-docker/"
+        echo ""
+        echo "For kind, kubectl, and helm, you can use the provided installation scripts:"
+        for tool in "${missing_tools[@]}"; do
+            if [ "$tool" != "docker" ] && [ -f "${SCRIPT_DIR}/scripts/install-${tool}.sh" ]; then
+                echo "  - ${tool}: ./scripts/install-${tool}.sh"
+            fi
+        done
+        echo ""
+        echo "Or install them manually:"
         echo "  - kind: https://kind.sigs.k8s.io/docs/user/quick-start/#installation"
         echo "  - kubectl: https://kubernetes.io/docs/tasks/tools/"
         echo "  - helm: https://helm.sh/docs/intro/install/"
@@ -196,7 +214,7 @@ Setup Kannika Armory on a kind cluster.
 OPTIONS:
     -h, --help              Show this help message
     -c, --cluster NAME      Kind cluster name (default: kannika-kind)
-    -v, --version VERSION   Kannika version to install (default: 0.12.4)
+    -v, --version VERSION   Kannika version to install (default: 0.13.0)
     -n, --namespace NS      Kubernetes namespace for Kannika (default: kannika-system)
     -l, --license PATH      Path to license file (optional)
 
@@ -211,7 +229,7 @@ EXAMPLES:
     $0
 
     # Custom cluster name and version
-    $0 --cluster my-cluster --version 0.12.4
+    $0 --cluster my-cluster --version 0.13.0
 
     # With license file
     $0 --license /path/to/license.key
