@@ -144,6 +144,13 @@ create_kannika_data_namespace() {
         return 0
     fi
     
+    # Validate that data namespace is different from system namespace
+    if [ "${KANNIKA_DATA_NAMESPACE}" = "${KANNIKA_NAMESPACE}" ]; then
+        print_error "Data namespace cannot be the same as system namespace: ${KANNIKA_NAMESPACE}"
+        print_error "Please specify a different namespace for data resources."
+        exit 1
+    fi
+    
     print_info "Creating Kannika data namespace: ${KANNIKA_DATA_NAMESPACE}..."
     
     if kubectl get namespace "${KANNIKA_DATA_NAMESPACE}" >/dev/null 2>&1; then
