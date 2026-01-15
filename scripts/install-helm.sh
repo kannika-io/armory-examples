@@ -1,0 +1,44 @@
+#!/bin/bash
+
+set -e
+
+# Install helm to local .bin directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN_DIR="${SCRIPT_DIR}/../.bin"
+HELM_VERSION="${HELM_VERSION:-v3.17.0}"
+
+mkdir -p "${BIN_DIR}"
+
+echo "Installing helm ${HELM_VERSION} to ${BIN_DIR}..."
+
+# Detect OS and architecture
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+ARCH="$(uname -m)"
+
+case "${ARCH}" in
+    x86_64)
+        ARCH="amd64"
+        ;;
+    aarch64|arm64)
+        ARCH="arm64"
+        ;;
+    *)
+        echo "Unsupported architecture: ${ARCH}"
+        exit 1
+        ;;
+esac
+
+# Download and extract helm
+HELM_TAR="helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz"
+HELM_URL="https://get.helm.sh/${HELM_TAR}"
+
+TMP_DIR=$(mktemp -d)
+trap "rm -rf ${TMP_DIR}" EXIT
+
+curl -Lo "${TMP_DIR}/${HELM_TAR}" "${HELM_URL}"
+tar -xzf "${TMP_DIR}/${HELM_TAR}" -C "${TMP_DIR}"
+mv "${TMP_DIR}/${OS}-${ARCH}/helm" "${BIN_DIR}/helm"
+chmod +x "${BIN_DIR}/helm"
+
+echo "helm installed successfully!"
+echo "Add ${BIN_DIR} to your PATH or use: ${BIN_DIR}/helm"
