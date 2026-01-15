@@ -109,7 +109,8 @@ get_kind_control_plane() {
         echo "Available Kind containers:"
         docker ps --filter "name=control-plane" --format "  - {{.Names}}"
         echo ""
-        print_error "Please create the Kind cluster first with: ./setup-kannika-armory.sh"
+        print_error "Please create the Kind cluster first."
+        print_error "You can use './setup-kannika-armory.sh' or 'kind create cluster --name ${CLUSTER_NAME}'"
         exit 1
     fi
     
