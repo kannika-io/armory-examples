@@ -1,4 +1,4 @@
-# armory-examples
+# Kannika Armory Examples
 
 A collection of examples for Kannika Armory https://kannika.io
 
@@ -31,3 +31,4 @@ For detailed instructions, see [SETUP.md](SETUP.md).
 
 - [Kannika Documentation](https://docs.kannika.io/)
 - [Kannika Installation Guide](https://docs.kannika.io/installation/)
+
