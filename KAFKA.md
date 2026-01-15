@@ -86,7 +86,21 @@ docker exec kafka-source kafka-console-consumer --bootstrap-server kafka-source:
 
 ## Connecting from Kind Cluster
 
-To allow your Kind cluster to access the Kafka clusters:
+To allow your Kind cluster to access the Kafka clusters, use the provided script:
+
+```bash
+./connect-kafka-to-kind.sh
+```
+
+This script will:
+- Check that Docker and the Kafka network are running
+- Find the Kind cluster control plane container
+- Connect it to the kafka-migration network
+- Verify the connection
+
+### Manual Connection (Alternative)
+
+If you prefer to connect manually or need to connect a different Kind cluster:
 
 ### 1. Connect Kind Network to Kafka Network
 
