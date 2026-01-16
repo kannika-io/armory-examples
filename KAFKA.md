@@ -7,8 +7,8 @@ This setup provides two Kafka clusters for simulating Kafka migrations with Kann
 The `docker-compose.yml` file sets up:
 - **kafka-source**: Source Kafka cluster (localhost:9092)
 - **kafka-target**: Target Kafka cluster (localhost:9093)
-- **kafka-ui-source**: Web console for source cluster (http://localhost:8080)
-- **kafka-ui-target**: Web console for target cluster (http://localhost:8081)
+- **kafka-ui-source**: Web console for source cluster (http://localhost:8180)
+- **kafka-ui-target**: Web console for target cluster (http://localhost:8181)
 
 Both clusters use Kafka KRaft mode (no ZooKeeper required) and are connected via the `kafka` Docker network.
 
@@ -35,8 +35,8 @@ docker-compose logs kafka-target
 
 ### Access the Web Consoles
 
-- **Source Cluster UI**: http://localhost:8080
-- **Target Cluster UI**: http://localhost:8081
+- **Source Cluster UI**: http://localhost:8180
+- **Target Cluster UI**: http://localhost:8181
 
 ## Connecting from Localhost
 
@@ -152,8 +152,8 @@ kafka-topics --bootstrap-server kafka-target:29092 --list
 │ Localhost                                                    │
 │  - kafka-source: localhost:9092                             │
 │  - kafka-target: localhost:9093                             │
-│  - kafka-ui-source: http://localhost:8080                   │
-│  - kafka-ui-target: http://localhost:8081                   │
+│  - kafka-ui-source: http://localhost:8180                   │
+│  - kafka-ui-target: http://localhost:8181                   │
 └─────────────────────────────────────────────────────────────┘
                             │
                             │
@@ -168,7 +168,7 @@ kafka-topics --bootstrap-server kafka-target:29092 --list
 │          │                                  │               │
 │  ┌─────────────────┐              ┌─────────────────┐      │
 │  │ kafka-ui-source │              │ kafka-ui-target │      │
-│  │   :8080 (ext)   │              │   :8081 (ext)   │      │
+│  │   :8180 (ext)   │              │   :8181 (ext)   │      │
 │  └─────────────────┘              └─────────────────┘      │
 │                                                              │
 │  ◄─── Kind Cluster (when connected via docker network) ───► │
@@ -182,14 +182,14 @@ kafka-topics --bootstrap-server kafka-target:29092 --list
 - **Container Name**: `kafka-source`
 - **Internal Address**: `kafka-source:29092`
 - **External Address**: `localhost:9092`
-- **UI Console**: http://localhost:8080
+- **UI Console**: http://localhost:8180
 - **Data Volume**: `kafka-source-data`
 
 ### Kafka Target Cluster
 - **Container Name**: `kafka-target`
 - **Internal Address**: `kafka-target:29092`
 - **External Address**: `localhost:9093`
-- **UI Console**: http://localhost:8081
+- **UI Console**: http://localhost:8181
 - **Data Volume**: `kafka-target-data`
 
 ## Managing the Environment
@@ -235,8 +235,8 @@ docker-compose restart kafka-source
    ```bash
    lsof -i :9092
    lsof -i :9093
-   lsof -i :8080
-   lsof -i :8081
+   lsof -i :8180
+   lsof -i :8181
    ```
 
 2. Check container logs:
