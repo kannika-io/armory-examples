@@ -7,8 +7,8 @@ This setup provides two Kafka clusters for simulating Kafka migrations with Kann
 The `docker-compose.yml` file sets up:
 - **kafka-source**: Source Kafka cluster (localhost:9092)
 - **kafka-target**: Target Kafka cluster (localhost:9093)
-- **kafka-ui-source**: Web console for source cluster (http://localhost:8180)
-- **kafka-ui-target**: Web console for target cluster (http://localhost:8181)
+- **console-source**: Redpanda Console for source cluster (http://localhost:8180)
+- **console-target**: Redpanda Console for target cluster (http://localhost:8181)
 
 Both clusters use Kafka KRaft mode (no ZooKeeper required) and are connected via the `kafka` Docker network.
 
@@ -152,8 +152,8 @@ kafka-topics --bootstrap-server kafka-target:29092 --list
 │ Localhost                                                    │
 │  - kafka-source: localhost:9092                             │
 │  - kafka-target: localhost:9093                             │
-│  - kafka-ui-source: http://localhost:8180                   │
-│  - kafka-ui-target: http://localhost:8181                   │
+│  - console-source: http://localhost:8180                   │
+│  - console-target: http://localhost:8181                   │
 └─────────────────────────────────────────────────────────────┘
                             │
                             │
@@ -167,7 +167,7 @@ kafka-topics --bootstrap-server kafka-target:29092 --list
 │  └─────────────────┘              └─────────────────┘      │
 │          │                                  │               │
 │  ┌─────────────────┐              ┌─────────────────┐      │
-│  │ kafka-ui-source │              │ kafka-ui-target │      │
+│  │ console-source │              │ console-target │      │
 │  │   :8180 (ext)   │              │   :8181 (ext)   │      │
 │  └─────────────────┘              └─────────────────┘      │
 │                                                              │
@@ -182,14 +182,14 @@ kafka-topics --bootstrap-server kafka-target:29092 --list
 - **Container Name**: `kafka-source`
 - **Internal Address**: `kafka-source:29092`
 - **External Address**: `localhost:9092`
-- **UI Console**: http://localhost:8180
+- **Redpanda Console**: http://localhost:8180
 - **Data Volume**: `kafka-source-data`
 
 ### Kafka Target Cluster
 - **Container Name**: `kafka-target`
 - **Internal Address**: `kafka-target:29092`
 - **External Address**: `localhost:9093`
-- **UI Console**: http://localhost:8181
+- **Redpanda Console**: http://localhost:8181
 - **Data Volume**: `kafka-target-data`
 
 ## Managing the Environment
@@ -214,7 +214,7 @@ docker-compose logs -f
 
 # Specific service
 docker-compose logs -f kafka-source
-docker-compose logs -f kafka-ui-source
+docker-compose logs -f console-source
 ```
 
 ### Restart Services
@@ -262,7 +262,7 @@ docker-compose restart kafka-source
    kubectl run busybox --image=busybox --rm -it --restart=Never -- nslookup kafka-source
    ```
 
-### UI Console Not Loading
+### Redpanda Console Not Loading
 
 1. Verify Kafka is running and healthy:
    ```bash
@@ -271,8 +271,8 @@ docker-compose restart kafka-source
 
 2. Check UI logs:
    ```bash
-   docker-compose logs kafka-ui-source
-   docker-compose logs kafka-ui-target
+   docker-compose logs console-source
+   docker-compose logs console-target
    ```
 
 ## Advanced Usage
@@ -284,11 +284,11 @@ Once both Kafka clusters are running and accessible from your Kind cluster:
 1. Configure Kannika to connect to source cluster (`kafka-source:29092`)
 2. Configure target cluster (`kafka-target:29092`)
 3. Set up migration policies
-4. Monitor the migration via Kafka UI consoles
+4. Monitor the migration via Redpanda Console
 
 ## References
 
 - [Confluent Kafka Docker Images](https://hub.docker.com/r/confluentinc/cp-kafka)
-- [Kafka UI](https://github.com/provectus/kafka-ui)
+- [Redpanda Console](https://github.com/redpanda-data/console)
 - [Kafka KRaft Mode](https://kafka.apache.org/documentation/#kraft)
 - [Docker Compose Documentation](https://docs.docker.com/compose/)

@@ -26,16 +26,14 @@ services:
     networks:
       - kafka
 
-  # Source Kafka UI Console
-  kafka-ui-source:
-    image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui-source
+  # Source Redpanda Console
+  console-source:
+    image: docker.redpanda.com/redpandadata/console:latest
+    container_name: console-source
     ports:
       - "8180:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: source
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-source:29092
-      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_BROKERS: kafka-source:29092
     depends_on:
       - kafka-source
     networks:
@@ -68,16 +66,14 @@ services:
     networks:
       - kafka
 
-  # Target Kafka UI Console
-  kafka-ui-target:
-    image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui-target
+  # Target Redpanda Console
+  console-target:
+    image: docker.redpanda.com/redpandadata/console:latest
+    container_name: console-target
     ports:
       - "8181:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: target
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-target:29092
-      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_BROKERS: kafka-target:29092
     depends_on:
       - kafka-target
     networks:
