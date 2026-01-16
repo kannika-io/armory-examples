@@ -380,8 +380,9 @@ main() {
     echo "     Source: http://localhost:8180"
     echo "     Target: http://localhost:8181"
     echo ""
-    echo "  5. To delete the cluster when done:"
-    echo "     kind delete cluster --name ${CLUSTER_NAME}"
+    echo "  5. To tear down the environment:"
+    echo "     ./teardown.sh          # Kind cluster only"
+    echo "     ./teardown.sh --all    # Kind cluster and Kafka"
     echo ""
 }
 
