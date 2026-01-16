@@ -11,8 +11,8 @@ NC='\033[0m' # No Color
 # Configuration
 CLUSTER_NAME="${CLUSTER_NAME:-kannika-kind}"
 KANNIKA_VERSION="${KANNIKA_VERSION:-0.13.0}"
-KANNIKA_NAMESPACE="${KANNIKA_NAMESPACE:-kannika-system}"
-KANNIKA_DATA_NAMESPACE="${KANNIKA_DATA_NAMESPACE:-}"
+KANNIKA_SYSTEM_NS="${KANNIKA_SYSTEM_NS:-kannika-system}"
+KANNIKA_DATA_NS="${KANNIKA_DATA_NS:-}"
 LICENSE_PATH="${LICENSE_PATH:-}"
 
 # Print colored message
@@ -25,7 +25,7 @@ print_warning() {
 }
 
 print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+    echo -e "${RED}[ERROR]${NC} $1" >&2
 }
 
 # Get the script directory
@@ -45,25 +45,25 @@ command_exists() {
 # Check prerequisites
 check_prerequisites() {
     print_info "Checking prerequisites..."
-    
+
     local missing_tools=()
-    
+
     if ! command_exists docker; then
         missing_tools+=("docker")
     fi
-    
+
     if ! command_exists kind; then
         missing_tools+=("kind")
     fi
-    
+
     if ! command_exists kubectl; then
         missing_tools+=("kubectl")
     fi
-    
+
     if ! command_exists helm; then
         missing_tools+=("helm")
     fi
-    
+
     if [ ${#missing_tools[@]} -ne 0 ]; then
         print_error "Missing required tools: ${missing_tools[*]}"
         echo ""
@@ -83,82 +83,82 @@ check_prerequisites() {
         echo "  - helm: https://helm.sh/docs/intro/install/"
         exit 1
     fi
-    
+
     # Check if Docker is running
     if ! docker ps >/dev/null 2>&1; then
         print_error "Docker is not running. Please start Docker and try again."
         exit 1
     fi
-    
+
     print_info "All prerequisites met!"
 }
 
 # Create kind cluster
 create_kind_cluster() {
     print_info "Creating kind cluster: ${CLUSTER_NAME}..."
-    
+
     # Check if cluster already exists
     if kind get clusters 2>/dev/null | grep -q "^${CLUSTER_NAME}$"; then
         print_warning "Cluster '${CLUSTER_NAME}' already exists. Skipping creation."
         kind get clusters
         return 0
     fi
-    
+
     # Create the cluster
     kind create cluster --name "${CLUSTER_NAME}"
-    
+
     # Verify cluster is ready
     kubectl cluster-info --context "kind-${CLUSTER_NAME}"
-    
+
     print_info "Kind cluster created successfully!"
 }
 
 # Install Kannika CRDs
 install_kannika_crds() {
     print_info "Installing Kannika CRDs (version ${KANNIKA_VERSION})..."
-    
+
     # Install CRDs using Helm
     helm install kannika-crd oci://quay.io/kannika/charts/kannika-crd \
         --version "${KANNIKA_VERSION}" \
         --wait
-    
+
     print_info "Kannika CRDs installed successfully!"
 }
 
 # Create Kannika namespace
 create_kannika_namespace() {
-    print_info "Creating Kannika system namespace: ${KANNIKA_NAMESPACE}..."
-    
-    if kubectl get namespace "${KANNIKA_NAMESPACE}" >/dev/null 2>&1; then
-        print_warning "Namespace '${KANNIKA_NAMESPACE}' already exists. Skipping creation."
+    print_info "Creating Kannika system namespace: ${KANNIKA_SYSTEM_NS}..."
+
+    if kubectl get namespace "${KANNIKA_SYSTEM_NS}" >/dev/null 2>&1; then
+        print_warning "Namespace '${KANNIKA_SYSTEM_NS}' already exists. Skipping creation."
     else
-        kubectl create namespace "${KANNIKA_NAMESPACE}"
+        kubectl create namespace "${KANNIKA_SYSTEM_NS}"
         print_info "System namespace created successfully!"
     fi
 }
 
 # Create Kannika data namespace
 create_kannika_data_namespace() {
-    if [ -z "${KANNIKA_DATA_NAMESPACE}" ]; then
+    if [ -z "${KANNIKA_DATA_NS}" ]; then
         print_info "No data namespace specified. Skipping data namespace creation."
         return 0
     fi
-    
+
     # Validate that data namespace is different from system namespace
-    if [ "${KANNIKA_DATA_NAMESPACE}" = "${KANNIKA_NAMESPACE}" ]; then
+    if [ "${KANNIKA_DATA_NS}" = "${KANNIKA_SYSTEM_NS}" ]; then
         print_error "Data namespace cannot be the same as system namespace."
-        print_error "System namespace: ${KANNIKA_NAMESPACE}"
-        print_error "Data namespace: ${KANNIKA_DATA_NAMESPACE}"
+        print_error "System namespace: ${KANNIKA_SYSTEM_NS}"
+        print_error "Data namespace: ${KANNIKA_DATA_NS}"
         print_error "Please specify a different namespace for data resources."
         exit 1
     fi
-    
-    print_info "Creating Kannika data namespace: ${KANNIKA_DATA_NAMESPACE}..."
-    
-    if kubectl get namespace "${KANNIKA_DATA_NAMESPACE}" >/dev/null 2>&1; then
-        print_warning "Namespace '${KANNIKA_DATA_NAMESPACE}' already exists. Skipping creation."
+
+    print_info "Creating Kannika data namespace: ${KANNIKA_DATA_NS}..."
+
+    if kubectl get namespace "${KANNIKA_DATA_NS}" >/dev/null 2>&1; then
+        print_warning "Namespace '${KANNIKA_DATA_NS}' already exists. Skipping creation."
     else
-        kubectl create namespace "${KANNIKA_DATA_NAMESPACE}"
+        kubectl create namespace "${KANNIKA_DATA_NS}"
         print_info "Data namespace created successfully!"
     fi
 }
@@ -172,12 +172,12 @@ create_license_secret() {
         echo ""
         print_warning "To add a license later, run:"
         echo "  kubectl create secret generic kannika-license \\"
-        echo "    --namespace ${KANNIKA_NAMESPACE} \\"
+        echo "    --namespace ${KANNIKA_SYSTEM_NS} \\"
         echo "    --from-file=license=<path-to-license-file> \\"
         echo "    --type=kannika.io/license"
         return 0
     fi
-    
+
     if [ ! -f "${LICENSE_PATH}" ]; then
         print_error "License file not found: ${LICENSE_PATH}"
         print_warning "Continuing without license. You can add it later."
@@ -186,54 +186,54 @@ create_license_secret() {
         echo ""
         return 0
     fi
-    
+
     print_info "Creating license secret..."
-    
+
     kubectl create secret generic kannika-license \
-        --namespace "${KANNIKA_NAMESPACE}" \
+        --namespace "${KANNIKA_SYSTEM_NS}" \
         --from-file=license="${LICENSE_PATH}" \
         --type=kannika.io/license
-    
+
     print_info "License secret created successfully!"
 }
 
 # Install Kannika Armory
 install_kannika_armory() {
     print_info "Installing Kannika Armory (version ${KANNIKA_VERSION})..."
-    
+
     helm install kannika oci://quay.io/kannika/charts/kannika \
-        --namespace "${KANNIKA_NAMESPACE}" \
+        --namespace "${KANNIKA_SYSTEM_NS}" \
         --version "${KANNIKA_VERSION}" \
         --wait
-    
+
     print_info "Kannika Armory installed successfully!"
 }
 
 # Verify installation
 verify_installation() {
     print_info "Verifying Kannika Armory installation..."
-    
+
     echo ""
-    echo "Deployments in namespace ${KANNIKA_NAMESPACE}:"
-    kubectl get deployments --namespace "${KANNIKA_NAMESPACE}"
-    
+    echo "Deployments in namespace ${KANNIKA_SYSTEM_NS}:"
+    kubectl get deployments --namespace "${KANNIKA_SYSTEM_NS}"
+
     echo ""
-    echo "Pods in namespace ${KANNIKA_NAMESPACE}:"
-    kubectl get pods --namespace "${KANNIKA_NAMESPACE}"
-    
+    echo "Pods in namespace ${KANNIKA_SYSTEM_NS}:"
+    kubectl get pods --namespace "${KANNIKA_SYSTEM_NS}"
+
     echo ""
     print_info "Checking deployment status..."
-    
+
     # Wait for deployments to be ready
     local deployments=("api" "console" "operator")
     for deployment in "${deployments[@]}"; do
-        if kubectl get deployment "${deployment}" --namespace "${KANNIKA_NAMESPACE}" >/dev/null 2>&1; then
+        if kubectl get deployment "${deployment}" --namespace "${KANNIKA_SYSTEM_NS}" >/dev/null 2>&1; then
             print_info "Waiting for deployment '${deployment}' to be ready..."
             kubectl wait --for=condition=available --timeout=300s \
-                deployment/"${deployment}" --namespace "${KANNIKA_NAMESPACE}" || true
+                deployment/"${deployment}" --namespace "${KANNIKA_SYSTEM_NS}" || true
         fi
     done
-    
+
     print_info "Installation verification complete!"
 }
 
@@ -255,8 +255,8 @@ OPTIONS:
 ENVIRONMENT VARIABLES:
     CLUSTER_NAME               Same as --cluster
     KANNIKA_VERSION            Same as --version
-    KANNIKA_NAMESPACE          Same as --namespace
-    KANNIKA_DATA_NAMESPACE     Same as --data-namespace
+    KANNIKA_SYSTEM_NS          Same as --namespace
+    KANNIKA_DATA_NS            Same as --data-namespace
     LICENSE_PATH               Same as --license
 
 EXAMPLES:
@@ -307,7 +307,7 @@ parse_args() {
                     print_error "Option --namespace requires a value"
                     exit 1
                 fi
-                KANNIKA_NAMESPACE="$2"
+                KANNIKA_SYSTEM_NS="$2"
                 shift 2
                 ;;
             -l|--license)
@@ -323,7 +323,7 @@ parse_args() {
                     print_error "Option --data-namespace requires a value"
                     exit 1
                 fi
-                KANNIKA_DATA_NAMESPACE="$2"
+                KANNIKA_DATA_NS="$2"
                 shift 2
                 ;;
             *)
@@ -339,17 +339,17 @@ parse_args() {
 main() {
     print_info "Starting Kannika Armory setup on kind cluster..."
     echo ""
-    
+
     parse_args "$@"
-    
+
     echo "Configuration:"
     echo "  Cluster name: ${CLUSTER_NAME}"
     echo "  Kannika version: ${KANNIKA_VERSION}"
-    echo "  System namespace: ${KANNIKA_NAMESPACE}"
-    echo "  Data namespace: ${KANNIKA_DATA_NAMESPACE:-<not provided>}"
+    echo "  System namespace: ${KANNIKA_SYSTEM_NS}"
+    echo "  Data namespace: ${KANNIKA_DATA_NS:-<not provided>}"
     echo "  License path: ${LICENSE_PATH:-<not provided>}"
     echo ""
-    
+
     check_prerequisites
     create_kind_cluster
     install_kannika_crds
@@ -358,20 +358,29 @@ main() {
     create_license_secret
     install_kannika_armory
     verify_installation
-    
+
     echo ""
     print_info "========================================="
     print_info "Kannika Armory setup completed!"
     print_info "========================================="
     echo ""
     echo "Next steps:"
-    echo "  1. Access your cluster:"
-    echo "     kubectl config use-context kind-${CLUSTER_NAME}"
     echo ""
-    echo "  2. Check the status:"
-    echo "     kubectl get all -n ${KANNIKA_NAMESPACE}"
+    echo "  1. Access the Kannika console:"
+    echo "     kubectl port-forward -n ${KANNIKA_SYSTEM_NS} svc/console 8080:80"
+    echo "     Open http://localhost:8080"
     echo ""
-    echo "  3. To delete the cluster when done:"
+    echo "  2. Start Kafka clusters:"
+    echo "     docker-compose up -d"
+    echo ""
+    echo "  3. Connect Kind to Kafka:"
+    echo "     ./connect-kafka-to-kind.sh"
+    echo ""
+    echo "  4. Access Redpanda Console:"
+    echo "     Source: http://localhost:8180"
+    echo "     Target: http://localhost:8181"
+    echo ""
+    echo "  5. To delete the cluster when done:"
     echo "     kind delete cluster --name ${CLUSTER_NAME}"
     echo ""
 }

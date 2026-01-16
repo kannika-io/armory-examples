@@ -18,7 +18,7 @@ print_warning() {
 }
 
 print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+    echo -e "${RED}[ERROR]${NC} $1" >&2
 }
 
 # Configuration
@@ -107,19 +107,12 @@ check_kafka_network() {
 # Get Kind control plane container name
 get_kind_control_plane() {
     local container_name="${CLUSTER_NAME}-control-plane"
-    
+
     if ! docker ps --format '{{.Names}}' | grep -q "^${container_name}$"; then
-        print_error "Kind cluster '${CLUSTER_NAME}' control plane container not found."
-        print_error "Expected container name: ${container_name}"
-        echo ""
-        echo "Available Kind containers:"
-        docker ps --filter "name=control-plane" --format "  - {{.Names}}"
-        echo ""
-        print_error "Please create the Kind cluster first."
-        print_error "You can use './setup-kannika-armory.sh' or 'kind create cluster --name ${CLUSTER_NAME}'"
+        print_error "Kind cluster '${CLUSTER_NAME}' not found. Create it with: ./setup-kannika-armory.sh"
         exit 1
     fi
-    
+
     echo "${container_name}"
 }
 
@@ -171,10 +164,12 @@ main() {
     echo ""
     
     check_docker
-    check_kafka_network
-    
-    local container_name=$(get_kind_control_plane)
+
+    local container_name
+    container_name=$(get_kind_control_plane) || exit 1
     print_info "Found Kind control plane: ${container_name}"
+
+    check_kafka_network
     
     connect_to_network "${container_name}"
     verify_connection "${container_name}"
