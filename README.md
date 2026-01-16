@@ -21,6 +21,7 @@ For detailed instructions, see [SETUP.md](SETUP.md).
 - **docker-compose.yml** - Two Kafka clusters setup for simulating migrations
 - **KAFKA.md** - Guide for using the Kafka migration environment
 - **connect-kafka-to-kind.sh** - Script to connect Kind cluster to Kafka network
+- **teardown.sh** - Script to tear down the environment
 - **scripts/** - Optional installation scripts for kind, kubectl, and helm
 
 ## Prerequisites
@@ -47,3 +48,12 @@ docker compose up -d
 ./connect-kafka-to-kind.sh
 ```
 
+## Teardown
+
+```bash
+# Delete Kind cluster only
+./teardown.sh
+
+# Delete Kind cluster and stop Kafka
+./teardown.sh --all
+```
