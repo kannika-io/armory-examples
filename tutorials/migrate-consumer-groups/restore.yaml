@@ -1,0 +1,14 @@
+apiVersion: kannika.io/v1alpha
+kind: Restore
+metadata:
+  name: restore-prod-to-qa
+  namespace: kannika-data
+spec:
+  source: prod-storage
+  sink: qa-kafka
+  enabled: true
+  config:
+    legacyOffsetHeader: "__original_offset"
+    topics:
+      - source: orders-prod
+        target: orders-qa

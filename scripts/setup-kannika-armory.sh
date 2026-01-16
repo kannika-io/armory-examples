@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 CLUSTER_NAME="${CLUSTER_NAME:-kannika-kind}"
 KANNIKA_VERSION="${KANNIKA_VERSION:-0.13.0}"
 KANNIKA_SYSTEM_NS="${KANNIKA_SYSTEM_NS:-kannika-system}"
-KANNIKA_DATA_NS="${KANNIKA_DATA_NS:-}"
+KANNIKA_DATA_NS="${KANNIKA_DATA_NS:-kannika-data}"
 LICENSE_PATH="${LICENSE_PATH:-}"
 
 # Print colored message
@@ -104,8 +104,8 @@ create_kind_cluster() {
         return 0
     fi
 
-    # Create the cluster
-    kind create cluster --name "${CLUSTER_NAME}"
+    # Create the cluster with port mappings
+    kind create cluster --name "${CLUSTER_NAME}" --config "${SCRIPT_DIR}/kind-config.yaml"
 
     # Verify cluster is ready
     kubectl cluster-info --context "kind-${CLUSTER_NAME}"
@@ -139,11 +139,6 @@ create_kannika_namespace() {
 
 # Create Kannika data namespace
 create_kannika_data_namespace() {
-    if [ -z "${KANNIKA_DATA_NS}" ]; then
-        print_info "No data namespace specified. Skipping data namespace creation."
-        return 0
-    fi
-
     # Validate that data namespace is different from system namespace
     if [ "${KANNIKA_DATA_NS}" = "${KANNIKA_SYSTEM_NS}" ]; then
         print_error "Data namespace cannot be the same as system namespace."
@@ -161,6 +156,12 @@ create_kannika_data_namespace() {
         kubectl create namespace "${KANNIKA_DATA_NS}"
         print_info "Data namespace created successfully!"
     fi
+}
+
+# Set default kubectl namespace
+set_default_namespace() {
+    print_info "Setting default namespace to ${KANNIKA_DATA_NS}..."
+    kubectl config set-context --current --namespace="${KANNIKA_DATA_NS}"
 }
 
 # Create license secret
@@ -204,9 +205,23 @@ install_kannika_armory() {
     helm install kannika oci://quay.io/kannika/charts/kannika \
         --namespace "${KANNIKA_SYSTEM_NS}" \
         --version "${KANNIKA_VERSION}" \
+        --set global.kubernetes.namespace="${KANNIKA_DATA_NS}" \
+        --set console.config.apiUrl="http://localhost:8081" \
         --wait
 
     print_info "Kannika Armory installed successfully!"
+}
+
+# Expose services via NodePort
+expose_services() {
+    print_info "Exposing console and API services..."
+
+    kubectl patch svc console -n "${KANNIKA_SYSTEM_NS}" -p '{"spec": {"type": "NodePort", "ports": [{"port": 8080, "nodePort": 30080}]}}'
+    kubectl patch svc api -n "${KANNIKA_SYSTEM_NS}" -p '{"spec": {"type": "NodePort", "ports": [{"port": 8080, "nodePort": 30081}]}}'
+
+    print_info "Services exposed:"
+    echo "  Console: http://localhost:8080"
+    echo "  API:     http://localhost:8081"
 }
 
 # Verify installation
@@ -346,7 +361,7 @@ main() {
     echo "  Cluster name: ${CLUSTER_NAME}"
     echo "  Kannika version: ${KANNIKA_VERSION}"
     echo "  System namespace: ${KANNIKA_SYSTEM_NS}"
-    echo "  Data namespace: ${KANNIKA_DATA_NS:-<not provided>}"
+    echo "  Data namespace: ${KANNIKA_DATA_NS}"
     echo "  License path: ${LICENSE_PATH:-<not provided>}"
     echo ""
 
@@ -355,8 +370,10 @@ main() {
     install_kannika_crds
     create_kannika_namespace
     create_kannika_data_namespace
+    set_default_namespace
     create_license_secret
     install_kannika_armory
+    expose_services
     verify_installation
 
     echo ""
@@ -364,23 +381,23 @@ main() {
     print_info "Kannika Armory setup completed!"
     print_info "========================================="
     echo ""
+    echo "Kannika Armory:"
+    echo "  Console: http://localhost:8080"
+    echo "  API:     http://localhost:8081"
+    echo ""
     echo "Next steps:"
     echo ""
-    echo "  1. Access the Kannika console:"
-    echo "     kubectl port-forward -n ${KANNIKA_SYSTEM_NS} svc/console 8080:80"
-    echo "     Open http://localhost:8080"
-    echo ""
-    echo "  2. Start Kafka clusters:"
+    echo "  1. Start Kafka clusters:"
     echo "     docker-compose up -d"
     echo ""
-    echo "  3. Connect Kind to Kafka:"
+    echo "  2. Connect Kind to Kafka:"
     echo "     ./connect-kafka-to-kind.sh"
     echo ""
-    echo "  4. Access Redpanda Console:"
+    echo "  3. Access Redpanda Console:"
     echo "     Source: http://localhost:8180"
     echo "     Target: http://localhost:8181"
     echo ""
-    echo "  5. To tear down the environment:"
+    echo "  4. To tear down the environment:"
     echo "     ./teardown.sh          # Kind cluster only"
     echo "     ./teardown.sh --all    # Kind cluster and Kafka"
     echo ""

@@ -1,0 +1,5 @@
+{"key": "order-001", "value": {"orderId": "order-001", "customer": "Alice", "product": "Laptop Pro", "quantity": 1, "price": 1299.99, "status": "completed"}}
+{"key": "order-002", "value": {"orderId": "order-002", "customer": "Bob", "product": "Wireless Mouse", "quantity": 2, "price": 49.99, "status": "completed"}}
+{"key": "order-003", "value": {"orderId": "order-003", "customer": "Charlie", "product": "USB-C Hub", "quantity": 1, "price": 79.99, "status": "completed"}}
+{"key": "order-004", "value": {"orderId": "order-004", "customer": "Diana", "product": "Mechanical Keyboard", "quantity": 1, "price": 159.99, "status": "pending"}}
+{"key": "order-005", "value": {"orderId": "order-005", "customer": "Eve", "product": "Monitor Stand", "quantity": 1, "price": 89.99, "status": "pending"}}
