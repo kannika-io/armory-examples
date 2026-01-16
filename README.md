@@ -2,27 +2,41 @@
 
 A collection of examples for Kannika Armory https://kannika.io
 
-## Getting Started
+## Quick Start
 
-### Setup Kannika Armory on Kind
-
-Quickly set up Kannika Armory on a local Kubernetes cluster using kind (Kubernetes IN Docker).
+Run a tutorial:
 
 ```bash
-./setup-kannika-armory.sh
+./setup migrate-consumer-groups
 ```
 
-For detailed instructions, see [SETUP.md](SETUP.md).
+List available tutorials:
 
-## Contents
+```bash
+./setup list
+```
 
-- **setup-kannika-armory.sh** - Automated setup script for installing Kannika Armory on a kind cluster
-- **SETUP.md** - Comprehensive guide for setting up and using Kannika Armory locally
-- **docker-compose.yml** - Two Kafka clusters setup for simulating migrations
-- **KAFKA.md** - Guide for using the Kafka migration environment
-- **connect-kafka-to-kind.sh** - Script to connect Kind cluster to Kafka network
-- **teardown.sh** - Script to tear down the environment
-- **scripts/** - Optional installation scripts for kind, kubectl, and helm
+## Setup Commands
+
+```bash
+./setup <tutorial>    # Run a tutorial (sets up everything)
+./setup armory        # Set up Kannika Armory only
+./setup kafka         # Set up Kafka clusters only
+./setup list          # List available tutorials
+```
+
+## Services
+
+After setup, services are available at:
+
+| Component | Service | URL |
+|-----------|---------|-----|
+| Kannika Armory | Console | http://localhost:8080 |
+| Kannika Armory | API | http://localhost:8081 |
+| Kafka Source | Broker | localhost:9092 |
+| Kafka Source | Console | http://localhost:8180 |
+| Kafka Target | Broker | localhost:9093 |
+| Kafka Target | Console | http://localhost:8181 |
 
 ## Prerequisites
 
@@ -31,29 +45,15 @@ For detailed instructions, see [SETUP.md](SETUP.md).
 - kubectl v1.28+ (or use `./scripts/install-kubectl.sh`)
 - helm v3.9+ (or use `./scripts/install-helm.sh`)
 
+## Teardown
+
+```bash
+./teardown.sh          # Delete Kind cluster only
+./teardown.sh --all    # Delete Kind cluster and stop Kafka
+```
+
 ## Resources
 
 - [Kannika Documentation](https://docs.kannika.io/)
 - [Kannika Installation Guide](https://docs.kannika.io/installation/)
-
-## Kafka Setup
-
-To set up two Kafka clusters for testing migrations, see [KAFKA.md](KAFKA.md).
-
-```bash
-# Start the Kafka clusters
-docker compose up -d
-
-# Connect your Kind cluster to the Kafka network
-./connect-kafka-to-kind.sh
-```
-
-## Teardown
-
-```bash
-# Delete Kind cluster only
-./teardown.sh
-
-# Delete Kind cluster and stop Kafka
-./teardown.sh --all
-```
+- [Free Trial License](https://kannika.io/free-trial)
