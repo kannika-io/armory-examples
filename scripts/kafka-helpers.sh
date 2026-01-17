@@ -87,3 +87,14 @@ kafka_describe_group() {
         --bootstrap-server "${bootstrap}" \
         --group "${group}" --describe
 }
+
+kafka_delete_records() {
+    local container="$1" topic="$2" partition="${3:-0}" offset="$4"
+    [[ -z "$container" || -z "$topic" || -z "$offset" ]] && { print_error "Usage: kafka_delete_records <container> <topic> <partition> <offset>"; return 1; }
+    local bootstrap="${container}:29092"
+    print_info "Deleting records from ${topic} up to offset ${offset}"
+    echo "{\"partitions\": [{\"topic\": \"${topic}\", \"partition\": ${partition}, \"offset\": ${offset}}], \"version\": 1}" | \
+        docker exec -i "${container}" kafka-delete-records \
+            --bootstrap-server "${bootstrap}" \
+            --offset-json-file /dev/stdin
+}
