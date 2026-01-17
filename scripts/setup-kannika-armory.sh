@@ -30,12 +30,17 @@ print_error() {
 
 # Get the script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 BIN_DIR="${SCRIPT_DIR}/.bin"
+
+source "${SCRIPT_DIR}/env.sh"
+__env_load
 
 # Add local bin directory to PATH if it exists
 if [ -d "${BIN_DIR}" ]; then
     export PATH="${BIN_DIR}:${PATH}"
 fi
+
 
 # Check if a command exists
 command_exists() {
@@ -220,8 +225,8 @@ expose_services() {
     kubectl patch svc api -n "${KANNIKA_SYSTEM_NS}" -p '{"spec": {"type": "NodePort", "ports": [{"port": 8080, "nodePort": 30081}]}}'
 
     print_info "Services exposed:"
-    echo "  Console: http://localhost:8080"
-    echo "  API:     http://localhost:8081"
+    echo "  Console: http://localhost:${ARMORY_CONSOLE_PORT}"
+    echo "  API:     http://localhost:${ARMORY_API_PORT}"
 }
 
 # Verify installation
@@ -377,30 +382,7 @@ main() {
     verify_installation
 
     echo ""
-    print_info "========================================="
     print_info "Kannika Armory setup completed!"
-    print_info "========================================="
-    echo ""
-    echo "Kannika Armory:"
-    echo "  Console: http://localhost:8080"
-    echo "  API:     http://localhost:8081"
-    echo ""
-    echo "Next steps:"
-    echo ""
-    echo "  1. Start Kafka clusters:"
-    echo "     docker-compose up -d"
-    echo ""
-    echo "  2. Connect Kind to Kafka:"
-    echo "     ./connect-kafka-to-kind.sh"
-    echo ""
-    echo "  3. Access Redpanda Console:"
-    echo "     Source: http://localhost:8180"
-    echo "     Target: http://localhost:8181"
-    echo ""
-    echo "  4. To tear down the environment:"
-    echo "     ./teardown.sh          # Kind cluster only"
-    echo "     ./teardown.sh --all    # Kind cluster and Kafka"
-    echo ""
 }
 
 # Run main function

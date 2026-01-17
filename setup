@@ -7,6 +7,10 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TUTORIALS_DIR="${SCRIPT_DIR}/tutorials"
 
+source "${SCRIPT_DIR}/scripts/env.sh"
+source "${SCRIPT_DIR}/scripts/print-help.sh"
+__env_load
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -109,24 +113,17 @@ print_help() {
     local tutorial_dir="${TUTORIALS_DIR}/${tutorial}"
 
     # Read credentials from secret
-    local username password
-    username=$(kubectl get secret api -n kannika-system -o jsonpath='{.data.username}' 2>/dev/null | base64 -d)
-    password=$(kubectl get secret api -n kannika-system -o jsonpath='{.data.password}' 2>/dev/null | base64 -d)
+    ARMORY_USERNAME=$(kubectl get secret api -n kannika-system -o jsonpath='{.data.username}' 2>/dev/null | base64 -d)
+    ARMORY_PASSWORD=$(kubectl get secret api -n kannika-system -o jsonpath='{.data.password}' 2>/dev/null | base64 -d)
 
     echo ""
     echo "=============================================="
     echo "Setup Complete!"
     echo "=============================================="
     echo ""
-    echo "Kannika Armory:"
-    echo "  Console:  http://localhost:8080"
-    echo "  API:      http://localhost:8081"
-    echo "  Username: ${username:-<not found>}"
-    echo "  Password: ${password:-<not found>}"
+    print_armory_info
     echo ""
-    echo "Kafka:"
-    echo "  Source console: http://localhost:8180"
-    echo "  Target console: http://localhost:8181"
+    print_kafka_info
     echo ""
 
     # Print tutorial-specific help if exists
@@ -137,9 +134,7 @@ print_help() {
     fi
 
     echo ""
-    echo "Teardown:"
-    echo "  ./teardown.sh          # Kind cluster only"
-    echo "  ./teardown.sh --all    # Kind cluster and Kafka"
+    print_teardown_info
     echo ""
 }
 
