@@ -2,8 +2,7 @@
 # Environment configuration helpers
 
 __env_repo_root() {
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    echo "${script_dir}/.."
+    (cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 }
 
 __env_file() {

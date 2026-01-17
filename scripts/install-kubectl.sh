@@ -3,13 +3,10 @@
 set -e
 
 # Install kubectl to local .bin directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BIN_DIR="${SCRIPT_DIR}/../.bin"
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.bin"
 KUBECTL_VERSION="${KUBECTL_VERSION:-v1.31.4}"
 
 mkdir -p "${BIN_DIR}"
-
-echo "Installing kubectl ${KUBECTL_VERSION} to ${BIN_DIR}..."
 
 # Detect OS and architecture
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
@@ -30,8 +27,7 @@ esac
 
 # Download kubectl
 KUBECTL_URL="https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/${OS}/${ARCH}/kubectl"
-curl -Lo "${BIN_DIR}/kubectl" "${KUBECTL_URL}"
+curl -fsSLo "${BIN_DIR}/kubectl" "${KUBECTL_URL}"
 chmod +x "${BIN_DIR}/kubectl"
 
-echo "kubectl installed successfully!"
-echo "Add ${BIN_DIR} to your PATH or use: ${BIN_DIR}/kubectl"
+echo "${BIN_DIR}/kubectl"

@@ -75,9 +75,7 @@ setup_tools() {
     "${SCRIPT_DIR}/scripts/install-kind.sh"
     "${SCRIPT_DIR}/scripts/install-kubectl.sh"
     "${SCRIPT_DIR}/scripts/install-helm.sh"
-    print_info "Tools installed. Reloading PATH..."
-    __env_setup_path
-    print_info "Done. Tools available at: ${SCRIPT_DIR}/.bin"
+    print_info "Tools installed to $(__env_bin_dir)"
 }
 
 setup_armory() {
