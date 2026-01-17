@@ -4,7 +4,13 @@ A collection of examples for Kannika Armory https://kannika.io
 
 ## Quick Start
 
-Run a tutorial:
+Run a tutorial without cloning:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kannika-io/armory-examples/refs/heads/main/install.sh | bash -s -- migrate-consumer-groups
+```
+
+Or clone and run locally:
 
 ```bash
 ./setup migrate-consumer-groups
