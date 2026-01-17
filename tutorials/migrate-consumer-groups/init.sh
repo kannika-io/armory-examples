@@ -11,40 +11,38 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-source "${SCRIPT_DIR}/kafka-helpers.sh"
-
-SOURCE_TOPIC="orders-prod"
-TARGET_TOPIC="orders-qa"
-CONSUMER_GROUP="order-processor"
-MESSAGES_PROCESSED=3
+source "${REPO_ROOT}/scripts/kafka-helpers.sh"
 
 print_info "Setting up tutorial data..."
 
 # Clean up existing topics
-kafka_delete_topic source "${SOURCE_TOPIC}"
-kafka_delete_topic target "${TARGET_TOPIC}"
-sleep 2
+kafka_delete_topic kafka-source orders-prod
+kafka_delete_topic kafka-target orders-qa
 
 # Create topics
-kafka_create_topic source "${SOURCE_TOPIC}"
-kafka_create_topic target "${TARGET_TOPIC}"
+kafka_create_topic kafka-source orders-prod
+kafka_create_topic kafka-target orders-qa
 
 # Produce messages and create consumer group
-kafka_produce_jsonl "${SOURCE_TOPIC}" "${SCRIPT_DIR}/orders.jsonl"
-kafka_consume "${CONSUMER_GROUP}" "${SOURCE_TOPIC}" "${MESSAGES_PROCESSED}"
+kafka_produce_jsonl kafka-source orders-prod "${SCRIPT_DIR}/orders.jsonl"
+kafka_consume kafka-source order-processor orders-prod 3
 
 echo ""
 echo "Resources created:"
-echo "  - Topic: ${SOURCE_TOPIC} (5 messages) on kafka-source"
-echo "  - Topic: ${TARGET_TOPIC} (empty) on kafka-target"
-echo "  - Consumer group: ${CONSUMER_GROUP} (offset: ${MESSAGES_PROCESSED})"
+echo "  - Topic: orders-prod (5 messages) on kafka-source"
+echo "  - Topic: orders-qa (empty) on kafka-target"
+echo "  - Consumer group: order-processor (offset: 3)"
 echo ""
 echo "Consumer group status:"
-kafka_describe_group "${CONSUMER_GROUP}"
+kafka_describe_group kafka-source order-processor
 
 # Apply Kubernetes resources
 print_info "Applying Kubernetes resources..."
 kubectl apply -f "${SCRIPT_DIR}/eventhub.yaml"
 kubectl apply -f "${SCRIPT_DIR}/storage.yaml"
 kubectl apply -f "${SCRIPT_DIR}/backup.yaml"
+
+echo ""
+print_info "Setup complete. Verify with: kubectl get eventhub,storage,backup"
