@@ -31,15 +31,9 @@ print_error() {
 # Get the script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-BIN_DIR="${SCRIPT_DIR}/.bin"
 
 source "${SCRIPT_DIR}/env.sh"
 __env_load
-
-# Add local bin directory to PATH if it exists
-if [ -d "${BIN_DIR}" ]; then
-    export PATH="${BIN_DIR}:${PATH}"
-fi
 
 
 # Check if a command exists

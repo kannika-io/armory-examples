@@ -2,6 +2,10 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/scripts/env.sh"
+__env_load
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
