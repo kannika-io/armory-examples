@@ -10,8 +10,8 @@
 #
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+TUTORIAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${TUTORIAL_DIR}/../.." && pwd)"
 
 source "${REPO_ROOT}/scripts/kafka-helpers.sh"
 
@@ -26,11 +26,8 @@ kafka_create_topic kafka-source orders-prod
 kafka_create_topic kafka-target orders-qa
 
 # Produce 100 dummy messages to advance offset, then real orders
-print_info "Producing messages to advance offset to 100..."
-for i in $(seq 1 100); do
-    kafka_produce kafka-source orders-prod "init-${i}" '{"type":"init"}'
-done
-kafka_produce_jsonl kafka-source orders-prod "${SCRIPT_DIR}/orders.jsonl"
+kafka_produce_batch kafka-source orders-prod 100 '{}'
+kafka_produce_jsonl kafka-source orders-prod "${TUTORIAL_DIR}/orders.jsonl"
 
 # Delete the first 100 records, leaving only offsets 100-104
 kafka_delete_records kafka-source orders-prod 0 100
@@ -49,9 +46,9 @@ kafka_describe_group kafka-source order-processor
 
 # Apply Kubernetes resources
 print_info "Applying Kubernetes resources..."
-kubectl apply -f "${SCRIPT_DIR}/eventhub.yaml"
-kubectl apply -f "${SCRIPT_DIR}/storage.yaml"
-kubectl apply -f "${SCRIPT_DIR}/backup.yaml"
+kubectl apply -f "${TUTORIAL_DIR}/eventhub.yaml"
+kubectl apply -f "${TUTORIAL_DIR}/storage.yaml"
+kubectl apply -f "${TUTORIAL_DIR}/backup.yaml"
 
 echo ""
 print_info "Setup complete. Verify with: kubectl get eventhub,storage,backup"

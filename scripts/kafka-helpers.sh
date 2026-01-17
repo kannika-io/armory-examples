@@ -51,6 +51,20 @@ kafka_produce() {
         --property "key.separator=:" || { print_error "Failed to produce message to ${topic}"; return 1; }
 }
 
+kafka_produce_batch() {
+    local container="$1" topic="$2" count="$3" value="$4"
+    [[ -z "$container" || -z "$topic" || -z "$count" ]] && { print_error "Usage: kafka_produce_batch <container> <topic> <count> <value>"; return 1; }
+    kafka_check "${container}" || return 1
+    local bootstrap="${container}:29092"
+    print_info "Producing ${count} messages to ${topic}"
+    seq 1 "${count}" | while read i; do echo "${i}:${value}"; done | \
+        docker exec -i "${container}" kafka-console-producer \
+            --bootstrap-server "${bootstrap}" \
+            --topic "${topic}" \
+            --property "parse.key=true" \
+            --property "key.separator=:" || { print_error "Failed to produce batch to ${topic}"; return 1; }
+}
+
 kafka_produce_jsonl() {
     local container="$1" topic="$2" file="$3"
     [[ -z "$container" || -z "$topic" || -z "$file" ]] && { print_error "Usage: kafka_produce_jsonl <container> <topic> <file>"; return 1; }
