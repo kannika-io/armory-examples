@@ -6,6 +6,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TUTORIALS_DIR="${SCRIPT_DIR}/tutorials"
+CLUSTER_NAME="${CLUSTER_NAME:-${CLUSTER_NAME}}"
 
 source "${SCRIPT_DIR}/scripts/env.sh"
 source "${SCRIPT_DIR}/scripts/print-help.sh"
@@ -76,8 +77,8 @@ setup_tools() {
 }
 
 setup_armory() {
-    if kind get clusters 2>/dev/null | grep -q "^kannika-kind$"; then
-        print_warning "Kannika Kind cluster already exists, skipping armory setup."
+    if kind get clusters 2>/dev/null | grep -q "^${CLUSTER_NAME}$"; then
+        print_warning "Cluster '${CLUSTER_NAME}' already exists, skipping armory setup."
         return 0
     fi
     print_info "Setting up Kannika Armory..."
@@ -202,8 +203,8 @@ main() {
             ;;
         armory)
             shift
-            if kind get clusters 2>/dev/null | grep -q "^kannika-kind$"; then
-                print_warning "Kannika Kind cluster already exists."
+            if kind get clusters 2>/dev/null | grep -q "^${CLUSTER_NAME}$"; then
+                print_warning "Cluster '${CLUSTER_NAME}' already exists."
                 read -p "Re-run armory setup anyway? [y/N] " -n 1 -r
                 echo ""
                 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -218,7 +219,7 @@ main() {
         kafka)
             setup_kafka
             # Check if Kind cluster is running and offer to connect
-            if docker ps --format '{{.Names}}' | grep -q "kannika-kind-control-plane"; then
+            if docker ps --format '{{.Names}}' | grep -q "${CLUSTER_NAME}-control-plane"; then
                 echo ""
                 read -p "Kind cluster detected. Connect Kafka to Kind network? [Y/n] " -n 1 -r
                 echo ""
