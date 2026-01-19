@@ -1,0 +1,14 @@
+These files are redistributed under the Apache License 2.0.
+
+Sources:
+- external-provisioner-rbac.yaml: https://github.com/kubernetes-csi/external-provisioner (v6.0.0)
+- external-attacher-rbac.yaml: https://github.com/kubernetes-csi/external-attacher (v4.10.0)
+- rbac-csi-snapshotter.yaml: https://github.com/kubernetes-csi/external-snapshotter (v8.4.0)
+- external-resizer-rbac.yaml: https://github.com/kubernetes-csi/external-resizer (v2.0.0)
+- external-health-monitor-rbac.yaml: https://github.com/kubernetes-csi/external-health-monitor (v0.16.0)
+- csi-hostpath-driverinfo.yaml: https://github.com/kubernetes-csi/csi-driver-host-path (v1.17.0)
+- csi-hostpath-plugin.yaml: https://github.com/kubernetes-csi/csi-driver-host-path (v1.17.0)
+- csi-storageclass.yaml: https://github.com/kubernetes-csi/csi-driver-host-path (v1.17.0)
+
+All original works are copyright the Kubernetes Authors and licensed under Apache 2.0.
+See: https://www.apache.org/licenses/LICENSE-2.0
