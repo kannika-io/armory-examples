@@ -63,3 +63,7 @@ After setup, services are available at:
 - [Kannika Documentation](https://docs.kannika.io/)
 - [Kannika Installation Guide](https://docs.kannika.io/installation/)
 - [Free Trial License](https://kannika.io/free-trial)
+
+## Community
+
+Questions or feedback? Join us on [Slack](https://kannika-io.slack.com/) or get in touch at [hello@kannika.io](mailto:hello@kannika.io).

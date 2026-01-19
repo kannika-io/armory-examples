@@ -1,0 +1,9 @@
+apiVersion: kannika.io/v1alpha
+kind: EventHub
+metadata:
+  name: prod-kafka
+  namespace: kannika-data
+spec:
+  kafka:
+    properties:
+      bootstrap.servers: kafka-source:29092

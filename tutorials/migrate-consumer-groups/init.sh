@@ -39,7 +39,7 @@ kafka_consume kafka-source order-processor orders-prod 3
 
 echo ""
 echo "Resources created:"
-echo "  - Topic: orders-prod (5 messages at offsets 100-104) on kafka-source"
+echo "  - Topic: orders-prod (5 messages, starting at offset 100) on kafka-source"
 echo "  - Topic: orders-qa (empty) on kafka-target"
 echo "  - Consumer group: order-processor (offset: 103, 2 remaining)"
 echo ""
@@ -48,9 +48,7 @@ kafka_describe_group kafka-source order-processor
 
 # Apply Kubernetes resources
 print_info "Applying Kubernetes resources..."
-kubectl apply -f "${TUTORIAL_DIR}/eventhub.yaml"
-kubectl apply -f "${TUTORIAL_DIR}/storage.yaml"
-kubectl apply -f "${TUTORIAL_DIR}/backup.yaml"
+kubectl apply -f "${TUTORIAL_DIR}/setup/"
 
 echo ""
 print_info "Setup complete. Verify with: kubectl get eventhub,storage,backup"
