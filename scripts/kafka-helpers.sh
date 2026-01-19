@@ -1,9 +1,35 @@
 #!/bin/bash
-# Reusable Kafka helper functions for tutorials
-# Source this file: source scripts/kafka-helpers.sh
+#
+# Reusable Kafka helper functions for tutorials.
+#
+# Usage:
+#   source scripts/kafka-helpers.sh
 #
 # All functions take container name as first parameter (e.g., kafka-source, kafka-target).
-# Bootstrap is derived as: ${container}:29092
+# Bootstrap server is derived as: ${container}:29092
+#
+# Examples:
+#   # Create a topic with 3 partitions
+#   kafka_create_topic kafka-source my-topic 3
+#
+#   # Produce a single message
+#   kafka_produce kafka-source my-topic "key1" '{"msg": "hello"}'
+#
+#   # Produce 100 messages
+#   kafka_produce_batch kafka-source my-topic 100 "test-value"
+#
+#   # Produce from JSONL file (format: {"key": "k", "value": {...}})
+#   kafka_produce_jsonl kafka-source my-topic data.jsonl
+#
+#   # Consume 10 messages with consumer group
+#   kafka_consume kafka-source my-group my-topic 10
+#
+#   # Describe consumer group lag
+#   kafka_describe_group kafka-source my-group
+#
+#   # Delete records up to offset 50
+#   kafka_delete_records kafka-source my-topic 0 50
+#
 
 print_info() { echo -e "\033[0;32m[INFO]\033[0m $1"; }
 print_error() { echo -e "\033[0;31m[ERROR]\033[0m $1" >&2; }

@@ -1,4 +1,17 @@
 #!/bin/bash
+#
+# Install kubectl to the local .bin directory.
+#
+# Usage:
+#   ./scripts/install-kubectl.sh
+#
+# Environment variables:
+#   KUBECTL_VERSION    Version to install (default: v1.31.4)
+#
+# Examples:
+#   ./scripts/install-kubectl.sh
+#   KUBECTL_VERSION=v1.31.4 ./scripts/install-kubectl.sh
+#
 
 set -e
 

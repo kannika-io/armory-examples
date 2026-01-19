@@ -1,4 +1,17 @@
 #!/bin/bash
+#
+# Install kind (Kubernetes IN Docker) to the local .bin directory.
+#
+# Usage:
+#   ./scripts/install-kind.sh
+#
+# Environment variables:
+#   KIND_VERSION    Version to install (default: v0.31.0)
+#
+# Examples:
+#   ./scripts/install-kind.sh
+#   KIND_VERSION=v0.31.0 ./scripts/install-kind.sh
+#
 
 set -e
 

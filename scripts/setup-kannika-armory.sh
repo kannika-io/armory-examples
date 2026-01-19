@@ -118,7 +118,7 @@ create_kind_cluster() {
     fi
 
     # Create the cluster with port mappings
-    kind create cluster --name "${CLUSTER_NAME}" --config "${SCRIPT_DIR}/kind-config.yaml"
+    kind create cluster --name "${CLUSTER_NAME}" --config "${REPO_ROOT}/kind-config.yaml"
 
     # Verify cluster is ready
     kubectl cluster-info --context "kind-${CLUSTER_NAME}"

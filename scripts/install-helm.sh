@@ -1,4 +1,17 @@
 #!/bin/bash
+#
+# Install helm to the local .bin directory.
+#
+# Usage:
+#   ./scripts/install-helm.sh
+#
+# Environment variables:
+#   HELM_VERSION    Version to install (default: v3.17.0)
+#
+# Examples:
+#   ./scripts/install-helm.sh
+#   HELM_VERSION=v3.17.0 ./scripts/install-helm.sh
+#
 
 set -e
 
