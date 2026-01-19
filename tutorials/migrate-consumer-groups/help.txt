@@ -1,8 +1,8 @@
 Tutorial: Migrate Consumer Groups
 
 Resources created:
-  - Topic: orders-prod (5 messages) on kafka-source
+  - Topic: orders-prod (5 messages, starting at offset 100) on kafka-source
   - Topic: orders-qa (empty) on kafka-target
-  - Consumer group: order-processor (offset: 3)
+  - Consumer group: order-processor (offset: 103, 2 remaining)
 
 Continue at: https://docs.kannika.io/tutorials/environment-cloning/migrate-consumer-groups/

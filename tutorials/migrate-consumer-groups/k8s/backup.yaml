@@ -1,0 +1,13 @@
+# Backup job that continuously backs up the orders-prod topic
+# from prod-kafka to prod-storage
+apiVersion: kannika.io/v1alpha
+kind: Backup
+metadata:
+  name: prod-backup
+  namespace: kannika-data
+spec:
+  source: prod-kafka   # EventHub to read from
+  sink: prod-storage   # Storage to write backup data to
+  enabled: true        # Start backing up immediately
+  streams:             # Topics to back up
+    - topic: orders-prod

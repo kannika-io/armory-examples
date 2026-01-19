@@ -1,0 +1,11 @@
+# EventHub representing the production Kafka cluster (source)
+# This is where the orders-prod topic with existing data lives
+apiVersion: kannika.io/v1alpha
+kind: EventHub
+metadata:
+  name: prod-kafka
+  namespace: kannika-data
+spec:
+  kafka:
+    properties:                             # Kafka client properties
+      bootstrap.servers: kafka-source:29092 # Internal broker address

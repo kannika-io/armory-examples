@@ -55,17 +55,14 @@ list_tutorials() {
     for dir in "${TUTORIALS_DIR}"/*/; do
         [ -d "$dir" ] || continue
         local name=$(basename "$dir")
-        local init_file="${dir}init.sh"
-        if [ -f "$init_file" ]; then
-            local desc=""
-            if [ -f "${dir}README.md" ]; then
-                desc=$(head -1 "${dir}README.md" | sed 's/^#* *//')
-            fi
-            if [ -n "$desc" ]; then
-                printf "%s%-25s %s\n" "$prefix" "$name" "$desc"
-            else
-                echo "${prefix}${name}"
-            fi
+        local desc=""
+        if [ -f "${dir}README.md" ]; then
+            desc=$(head -1 "${dir}README.md" | sed 's/^#* *//')
+        fi
+        if [ -n "$desc" ]; then
+            printf "%s%-25s %s\n" "$prefix" "$name" "$desc"
+        else
+            echo "${prefix}${name}"
         fi
     done
 }
@@ -106,7 +103,6 @@ run_tutorial_init() {
     local init_file="${tutorial_dir}/init.sh"
 
     if [ ! -f "$init_file" ]; then
-        print_warning "No init.sh found for tutorial ${tutorial}, skipping tutorial init"
         return 0
     fi
 
@@ -116,6 +112,19 @@ run_tutorial_init() {
 
     print_info "Initializing tutorial resources..."
     "$init_file"
+}
+
+apply_tutorial_k8s() {
+    local tutorial="$1"
+    local tutorial_dir="${TUTORIALS_DIR}/${tutorial}"
+    local k8s_dir="${tutorial_dir}/k8s"
+
+    if [ ! -d "$k8s_dir" ]; then
+        return 0
+    fi
+
+    print_info "Applying Kubernetes resources..."
+    kubectl apply -f "$k8s_dir"
 }
 
 print_help() {
@@ -161,11 +170,6 @@ run_tutorial() {
         exit 1
     fi
 
-    if [ ! -f "${tutorial_dir}/init.sh" ]; then
-        print_error "No init.sh found in ${tutorial_dir}"
-        exit 1
-    fi
-
     echo "=============================================="
     echo "Setup: ${tutorial}"
     echo "=============================================="
@@ -175,6 +179,7 @@ run_tutorial() {
     setup_kafka
     setup_network
     run_tutorial_init "$tutorial"
+    apply_tutorial_k8s "$tutorial"
     print_help "$tutorial"
 }
 

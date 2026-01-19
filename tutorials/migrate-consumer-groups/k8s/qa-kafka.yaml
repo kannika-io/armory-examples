@@ -1,0 +1,11 @@
+# EventHub representing the QA Kafka cluster (target)
+# Data will be restored here from the backup
+apiVersion: kannika.io/v1alpha
+kind: EventHub
+metadata:
+  name: qa-kafka
+  namespace: kannika-data
+spec:
+  kafka:
+    properties:                             # Kafka client properties
+      bootstrap.servers: kafka-target:29092 # Internal broker address

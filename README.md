@@ -58,6 +58,18 @@ After setup, services are available at:
 ./teardown.sh --all    # Delete Kind cluster and stop Kafka
 ```
 
+## Adding a Tutorial
+
+Create a new directory under `tutorials/` with:
+
+```
+tutorials/my-tutorial/
+├── init.sh      # Setup script (optional, must be executable)
+├── help.txt     # Printed after setup completes (optional)
+├── README.md    # First line used as description in ./setup list (optional)
+└── k8s/         # Kubernetes resources applied automatically (optional)
+```
+
 ## Resources
 
 - [Kannika Documentation](https://docs.kannika.io/)

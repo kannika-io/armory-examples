@@ -1,13 +1,5 @@
 #!/bin/bash
-#
 # Initialize tutorial resources for: Migrate Consumer Groups
-#
-# Creates:
-#   - orders-prod topic with 5 messages at offsets 100-104 (source)
-#   - orders-qa topic (target)
-#   - order-processor consumer group at offset 103
-#   - Kubernetes resources (eventhub, storage, backup)
-#
 set -e
 
 TUTORIAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -36,19 +28,3 @@ kafka_delete_records kafka-source orders-prod 0 100
 
 # Create consumer group at offset 103 (3 messages processed, 2 remaining)
 kafka_consume kafka-source order-processor orders-prod 3
-
-echo ""
-echo "Resources created:"
-echo "  - Topic: orders-prod (5 messages, starting at offset 100) on kafka-source"
-echo "  - Topic: orders-qa (empty) on kafka-target"
-echo "  - Consumer group: order-processor (offset: 103, 2 remaining)"
-echo ""
-echo "Consumer group status:"
-kafka_describe_group kafka-source order-processor
-
-# Apply Kubernetes resources
-print_info "Applying Kubernetes resources..."
-kubectl apply -f "${TUTORIAL_DIR}/setup/"
-
-echo ""
-print_info "Setup complete. Verify with: kubectl get eventhub,storage,backup"

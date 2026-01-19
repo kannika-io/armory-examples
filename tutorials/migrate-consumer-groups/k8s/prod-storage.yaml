@@ -1,0 +1,10 @@
+# Storage for backup data
+# Uses a persistent volume to store backed up messages
+apiVersion: kannika.io/v1alpha
+kind: Storage
+metadata:
+  name: prod-storage
+  namespace: kannika-data
+spec:
+  volume:
+    capacity: 1Gi # Size of the persistent volume claim

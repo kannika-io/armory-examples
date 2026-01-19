@@ -1,14 +1,16 @@
+# Restore job that restores orders-prod from backup to orders-qa
+# The legacyOffsetHeader preserves original offsets for consumer group migration
 apiVersion: kannika.io/v1alpha
 kind: Restore
 metadata:
   name: restore-prod-to-qa
   namespace: kannika-data
 spec:
-  source: prod-storage
-  sink: qa-kafka
-  enabled: true
+  source: prod-storage # Storage to read backup data from
+  sink: qa-kafka       # EventHub to restore to
+  enabled: true        # Start restoring immediately
   config:
-    legacyOffsetHeader: "__original_offset"
-    topics:
-      - source: orders-prod
-        target: orders-qa
+    legacyOffsetHeader: "__original_offset" # Header for original offset (for consumer group translation)
+    topics:                                 # Topics to restore
+      - source: orders-prod                 # Topic name in backup
+        target: orders-qa                   # Topic name to restore to in EventHub
