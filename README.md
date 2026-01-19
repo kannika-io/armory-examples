@@ -7,7 +7,8 @@ A collection of examples for Kannika Armory https://kannika.io
 Run a tutorial without cloning:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kannika-io/armory-examples/refs/heads/main/install.sh | bash -s -- migrate-consumer-groups
+curl -fsSL https://raw.githubusercontent.com/kannika-io/armory-examples/refs/heads/main/install.sh \
+  | bash -s -- migrate-consumer-groups
 ```
 
 Or clone and run locally:
@@ -22,13 +23,16 @@ List available tutorials:
 ./setup list
 ```
 
-## Setup Commands
+## Commands
 
 ```bash
 ./setup <tutorial>    # Run a tutorial (sets up everything)
 ./setup armory        # Set up Kannika Armory only
 ./setup kafka         # Set up Kafka clusters only
+./setup tools         # Install kind, kubectl, helm to .bin
 ./setup list          # List available tutorials
+./teardown            # Delete Kind cluster only
+./teardown --all      # Delete Kind cluster and stop Kafka
 ```
 
 ## Services
@@ -47,23 +51,14 @@ After setup, services are available at:
 ## Prerequisites
 
 - Docker
-- kind (or use `./scripts/install-kind.sh`)
-- kubectl v1.28+ (or use `./scripts/install-kubectl.sh`)
-- helm v3.9+ (or use `./scripts/install-helm.sh`)
-
-## Teardown
-
-```bash
-./teardown.sh          # Delete Kind cluster only
-./teardown.sh --all    # Delete Kind cluster and stop Kafka
-```
+- kind, kubectl, helm (or use `./setup tools`)
 
 ## Adding a Tutorial
 
-Create a new directory under `tutorials/` with:
+Create a new directory under `tutorials/`. The directory name is the tutorial name:
 
 ```
-tutorials/my-tutorial/
+tutorials/my-tutorial/           # Run with: ./setup my-tutorial
 ├── init.sh      # Setup script (optional, must be executable)
 ├── help.txt     # Printed after setup completes (optional)
 ├── README.md    # First line used as description in ./setup list (optional)
