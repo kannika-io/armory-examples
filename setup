@@ -156,6 +156,8 @@ print_help() {
     echo ""
     print_teardown_info
     echo ""
+    print_license_info
+    echo ""
 }
 
 run_tutorial() {

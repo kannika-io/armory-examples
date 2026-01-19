@@ -30,3 +30,18 @@ print_next_steps_armory() {
     echo "  ./setup <tutorial-name>    # Run a tutorial (includes Kafka)"
     echo "  ./setup list               # See available tutorials"
 }
+
+print_license_info() {
+    if kubectl get secret kannika-license -n kannika-system &>/dev/null; then
+        return 0
+    fi
+    print_warning "No license provided."
+    echo ""
+    echo "To get a free license, visit: https://www.kannika.io/free-trial"
+    echo ""
+    echo "To configure a license, run:"
+    echo "  kubectl create secret generic kannika-license \\"
+    echo "    --namespace kannika-system \\"
+    echo "    --from-file=license=<path-to-license-file> \\"
+    echo "    --type=kannika.io/license"
+}

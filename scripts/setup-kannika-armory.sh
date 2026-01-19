@@ -166,24 +166,15 @@ set_default_namespace() {
 # Create license secret
 create_license_secret() {
     if [ -z "${LICENSE_PATH}" ]; then
-        print_warning "No license path provided. Skipping license secret creation."
+        print_warning "No license provided. Skipping license secret creation."
         echo ""
         echo "To get a free license, visit: https://www.kannika.io/free-trial"
         echo ""
-        print_warning "To add a license later, run:"
+        echo "To configure a license, run:"
         echo "  kubectl create secret generic kannika-license \\"
         echo "    --namespace ${KANNIKA_SYSTEM_NS} \\"
         echo "    --from-file=license=<path-to-license-file> \\"
         echo "    --type=kannika.io/license"
-        return 0
-    fi
-
-    if [ ! -f "${LICENSE_PATH}" ]; then
-        print_error "License file not found: ${LICENSE_PATH}"
-        print_warning "Continuing without license. You can add it later."
-        echo ""
-        echo "To get a free license, visit: https://www.kannika.io/free-trial"
-        echo ""
         return 0
     fi
 
