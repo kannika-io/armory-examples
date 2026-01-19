@@ -1,10 +1,10 @@
-# Kannika Armory Setup on Kind
+# Setup Guide
 
-This guide provides instructions for setting up Kannika Armory on a local Kubernetes cluster using [kind](https://kind.sigs.k8s.io/) (Kubernetes IN Docker).
+This guide provides detailed instructions for setting up Kannika Armory on a local Kubernetes cluster using [kind](https://kind.sigs.k8s.io/).
 
 ## Prerequisites
 
-Before running the setup script, ensure you have the following tools installed:
+Before running setup, ensure you have the following:
 
 1. **Docker** - Container runtime
    - [Installation Guide](https://docs.docker.com/get-docker/)
@@ -12,177 +12,159 @@ Before running the setup script, ensure you have the following tools installed:
 
 2. **kind** - Kubernetes IN Docker
    - [Installation Guide](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-   - Or use the provided script: `./scripts/install-kind.sh`
    - Verify: `kind --version`
 
-3. **kubectl** - Kubernetes command-line tool (v1.28+)
+3. **kubectl** - Kubernetes CLI (v1.28+)
    - [Installation Guide](https://kubernetes.io/docs/tasks/tools/)
-   - Or use the provided script: `./scripts/install-kubectl.sh`
    - Verify: `kubectl version --client`
 
 4. **helm** - Kubernetes package manager (v3.9+)
    - [Installation Guide](https://helm.sh/docs/intro/install/)
-   - Or use the provided script: `./scripts/install-helm.sh`
    - Verify: `helm version`
 
-### Installing Prerequisites Locally
-
-For convenience, this repository includes optional installation scripts that will install `kind`, `kubectl`, and `helm` to a local `.bin` directory (which is git-ignored). This allows you to use these tools without requiring system-wide installation or administrator privileges.
+Install kind, kubectl, and helm locally (to `.bin`, git-ignored):
 
 ```bash
-# Install kind locally
-./scripts/install-kind.sh
-
-# Install kubectl locally
-./scripts/install-kubectl.sh
-
-# Install helm locally
-./scripts/install-helm.sh
+./setup tools
 ```
-
-The setup script will automatically detect and use tools from the `.bin` directory if they exist.
 
 ## Quick Start
 
-The simplest way to set up Kannika Armory:
+Run a tutorial (sets up everything automatically):
 
 ```bash
-./setup-kannika-armory.sh
+./setup <TUTORIAL>
+```
+
+Or run without cloning:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kannika-io/armory-examples/main/install.sh \
+  | bash -s -- <TUTORIAL>
+```
+
+## Commands
+
+```bash
+./setup <TUTORIAL>    # Run a tutorial (Armory + Kafka + tutorial resources)
+./setup armory        # Set up Kannika Armory only (Kind + Helm)
+./setup kafka         # Set up Kafka clusters only (docker-compose)
+./setup tools         # Install kind, kubectl, helm to .bin
+./setup list          # List available tutorials
+./teardown            # Delete Kind cluster and stop Kafka
+```
+
+## Setup Modes
+
+### Running a Tutorial
+
+```bash
+./setup <TUTORIAL>
 ```
 
 This will:
-1. Create a kind cluster named `kannika-kind`
-2. Install Kannika CRDs version 0.13.0
-3. Create the `kannika-system` namespace
-4. Install Kannika Armory version 0.13.0
-5. Verify the installation
+1. Create a Kind cluster with Kannika Armory
+2. Start source and target Kafka clusters
+3. Connect Kind to the Kafka network
+4. Initialize tutorial-specific resources
+5. Print access URLs and credentials
 
-## Usage
+### Armory Only
 
-### Basic Usage
-
-```bash
-./setup-kannika-armory.sh
-```
-
-### With Custom Options
+Set up just Kannika Armory without Kafka:
 
 ```bash
-# Custom cluster name
-./setup-kannika-armory.sh --cluster my-kannika-cluster
-
-# Specific Kannika version
-./setup-kannika-armory.sh --version 0.13.0
-
-# Custom system namespace
-./setup-kannika-armory.sh --namespace my-namespace
-
-# With data namespace (for resource isolation)
-./setup-kannika-armory.sh --data-namespace kannika-data
-
-# With license file
-./setup-kannika-armory.sh --license /path/to/license.key
-
-# Combine multiple options
-./setup-kannika-armory.sh \
-  --cluster production-kind \
-  --version 0.13.0 \
-  --namespace kannika-system \
-  --data-namespace kannika-data \
-  --license ./kannika-license.key
+./setup armory
 ```
 
-### Using Environment Variables
+Options can be passed through:
 
 ```bash
-# Set environment variables
-export CLUSTER_NAME=my-cluster
-export KANNIKA_VERSION=0.13.0
-export KANNIKA_NAMESPACE=kannika-system
-export KANNIKA_DATA_NAMESPACE=kannika-data
-export LICENSE_PATH=/path/to/license.key
-
-# Run the script
-./setup-kannika-armory.sh
+./setup armory --version 0.13.0 --license /path/to/license.key
 ```
 
-## Command-Line Options
+### Kafka Only
 
-| Option | Environment Variable | Default | Description |
-|--------|---------------------|---------|-------------|
-| `--cluster`, `-c` | `CLUSTER_NAME` | `kannika-kind` | Name of the kind cluster to create |
-| `--version`, `-v` | `KANNIKA_VERSION` | `0.13.0` | Version of Kannika Armory to install |
-| `--namespace`, `-n` | `KANNIKA_NAMESPACE` | `kannika-system` | Kubernetes namespace for Kannika system components |
-| `--data-namespace`, `-d` | `KANNIKA_DATA_NAMESPACE` | (none) | Kubernetes namespace for Kannika data resources |
-| `--license`, `-l` | `LICENSE_PATH` | (none) | Path to Kannika license file |
-| `--help`, `-h` | - | - | Show help message |
-
-### Understanding Namespaces
-
-Kannika uses two types of namespaces:
-
-- **System Namespace** (`--namespace`): Where Kannika Armory components (API, Console, Operator) are installed. Default: `kannika-system`
-- **Data/Resource Namespace** (`--data-namespace`): Optional namespace where your backup resources and data are managed. This provides isolation between system components and user resources.
-
-For more information about namespaces, see the [Kannika namespace documentation](https://docs.kannika.io/installation/configuration/namespaces/#resource-namespace).
-
-## What the Script Does
-
-1. **Prerequisites Check**: Verifies that Docker, kind, kubectl, and helm are installed and Docker is running.
-
-2. **Create Kind Cluster**: Creates a new kind cluster with the specified name (skips if already exists).
-
-3. **Install Kannika CRDs**: Installs Kannika Custom Resource Definitions using Helm.
-
-4. **Create Namespace**: Creates the Kannika system namespace in the cluster.
-
-5. **Create Data Namespace** (optional): If a data namespace is specified, creates the namespace for Kannika resources.
-
-6. **Create License Secret** (optional): If a license path is provided, creates a Kubernetes secret with the license.
-
-7. **Install Kannika Armory**: Installs Kannika Armory using Helm.
-
-8. **Verify Installation**: Checks that all deployments are running correctly.
-
-## Expected Output
-
-After successful installation, you should see three main deployments:
-- `api` - Kannika API server
-- `console` - Kannika web console
-- `operator` - Kannika operator for managing backups
-
-## Post-Installation
-
-### Verify the Installation
+Set up just the Kafka clusters:
 
 ```bash
-# Check all resources in the Kannika namespace
-kubectl get all -n kannika-system
-
-# Check deployment status
-kubectl get deployments -n kannika-system
-
-# Check pod logs (replace POD_NAME with actual pod name)
-kubectl logs -n kannika-system POD_NAME
+./setup kafka
 ```
 
-### Access the Cluster
+If a Kind cluster is detected, you'll be prompted to connect them.
+
+## Services
+
+After setup, services are available at:
+
+| Component | Service | URL |
+|-----------|---------|-----|
+| Kannika Armory | Console | http://localhost:8080 |
+| Kannika Armory | API | http://localhost:8081 |
+| Kafka Source | Broker | localhost:9092 |
+| Kafka Source | Console | http://localhost:8180 |
+| Kafka Target | Broker | localhost:9093 |
+| Kafka Target | Console | http://localhost:8181 |
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CLUSTER_NAME` | `kannika-kind` | Kind cluster name |
+| `KANNIKA_VERSION` | `0.13.0` | Kannika version to install |
+| `KANNIKA_SYSTEM_NS` | `kannika-system` | System namespace |
+| `KANNIKA_DATA_NS` | `kannika-data` | Data namespace |
+| `LICENSE_PATH` | - | Path to license file |
+
+### Armory Options
+
+When running `./setup armory`, you can pass options:
 
 ```bash
-# Set kubectl context to your kind cluster
-kubectl config use-context kind-kannika-kind
-
-# View cluster info
-kubectl cluster-info
+./setup armory --cluster my-cluster --version 0.13.0
+./setup armory --license /path/to/license.key
+./setup armory --namespace kannika-system --data-namespace kannika-data
 ```
 
-### Adding a License Later
+| Option | Description |
+|--------|-------------|
+| `-c, --cluster` | Kind cluster name |
+| `-v, --version` | Kannika version |
+| `-n, --namespace` | System namespace |
+| `-d, --data-namespace` | Data namespace |
+| `-l, --license` | License file path |
 
-If you didn't provide a license during setup, you can add it later.
+### Kind Cluster Configuration
 
-To get a free license, visit: https://www.kannika.io/free-trial
+The setup uses `kind-config.yaml` in the repository root, which configures port mappings:
+- Port 8080 → Kannika Console (NodePort 30080)
+- Port 8081 → Kannika API (NodePort 30081)
 
-Once you have a license file, create the secret:
+To add worker nodes, modify `kind-config.yaml`:
+
+```yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+    - containerPort: 30080
+      hostPort: 8080
+      protocol: TCP
+    - containerPort: 30081
+      hostPort: 8081
+      protocol: TCP
+- role: worker
+- role: worker
+```
+
+## Licensing
+
+If you didn't provide a license during setup, you can add one later.
+
+Get a free license at: https://www.kannika.io/free-trial
 
 ```bash
 kubectl create secret generic kannika-license \
@@ -191,95 +173,83 @@ kubectl create secret generic kannika-license \
   --type=kannika.io/license
 ```
 
+## Teardown
+
+Remove everything:
+
+```bash
+./teardown
+```
+
+This deletes the Kind cluster and stops Kafka containers.
+
+To remove only specific components:
+
+```bash
+# Delete Kind cluster only
+kind delete cluster --name kannika-kind
+
+# Stop Kafka only
+docker-compose down -v
+```
+
 ## Troubleshooting
 
 ### Docker Not Running
 
-If you see "Docker is not running" error:
-- Start Docker Desktop (macOS/Windows)
-- Start Docker daemon (Linux): `sudo systemctl start docker`
+```
+Docker is not running. Please start Docker and try again.
+```
+
+- macOS/Windows: Start Docker Desktop
+- Linux: `sudo systemctl start docker`
 
 ### Cluster Already Exists
 
-If the cluster already exists, the script will skip creation and use the existing cluster. To start fresh:
+The setup skips cluster creation if it already exists. To start fresh:
 
 ```bash
-kind delete cluster --name kannika-kind
-./setup-kannika-armory.sh
+./teardown
+./setup <command>
 ```
 
 ### Installation Timeout
 
-If the installation times out, you can check the status manually:
+Check pod status:
 
 ```bash
-# Check pod status
 kubectl get pods -n kannika-system
+kubectl describe pod <pod-name> -n kannika-system
+kubectl logs -n kannika-system <pod-name>
+```
 
-# Check pod events
-kubectl describe pod POD_NAME -n kannika-system
+### Kafka Connection Issues
 
-# Check logs
-kubectl logs -n kannika-system POD_NAME
+Verify the Kind cluster is connected to the Kafka network:
+
+```bash
+docker network inspect kafka
+```
+
+Reconnect if needed:
+
+```bash
+./scripts/connect-kafka-to-kind.sh
 ```
 
 ### Missing Tools
 
-If any prerequisite tools are missing, the script will report which ones need to be installed. Follow the installation links in the prerequisites section.
-
-## Cleanup
-
-To remove the kind cluster and all resources:
+Install locally with:
 
 ```bash
-kind delete cluster --name kannika-kind
+./setup tools
 ```
 
-This will completely remove the cluster and all Kannika resources.
-
-## Advanced Configuration
-
-### Multi-Node Cluster
-
-For a multi-node kind cluster, create a configuration file:
-
-```yaml
-# kind-config.yaml
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-- role: worker
-- role: worker
-```
-
-Then create the cluster manually before running the script:
-
-```bash
-kind create cluster --name kannika-kind --config kind-config.yaml
-./setup-kannika-armory.sh
-```
-
-### Custom Helm Values
-
-To customize Kannika installation, you can modify the script's `install_kannika_armory` function to include custom values:
-
-```bash
-helm install kannika oci://quay.io/kannika/charts/kannika \
-  --namespace "${KANNIKA_NAMESPACE}" \
-  --version "${KANNIKA_VERSION}" \
-  --set key=value \
-  --wait
-```
+Or install system-wide following the links in [Prerequisites](#prerequisites).
 
 ## Resources
 
 - [Kannika Documentation](https://docs.kannika.io/)
 - [Kannika Installation Guide](https://docs.kannika.io/installation/)
 - [kind Documentation](https://kind.sigs.k8s.io/)
-- [Kubernetes Documentation](https://kubernetes.io/docs/home/)
-- [Helm Documentation](https://helm.sh/docs/)
-
-## License
-
-This script is part of the armory-examples repository. See the [LICENSE](LICENSE) file for details.
+- [Free Trial License](https://kannika.io/free-trial)
