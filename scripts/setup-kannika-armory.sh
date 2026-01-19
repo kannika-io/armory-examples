@@ -109,6 +109,27 @@ create_kind_cluster() {
     # Verify cluster is ready
     kubectl cluster-info --context "kind-${CLUSTER_NAME}"
 
+    # Install CSI hostpath driver
+    print_info "Installing CSI hostpath driver..."
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-host-path/v1.17.0/deploy/kubernetes-1.30/hostpath/csi-hostpath-driverinfo.yaml
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-host-path/v1.17.0/deploy/kubernetes-1.30/hostpath/csi-hostpath-plugin.yaml
+
+    # Remove default annotation from standard storage class
+    kubectl patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+
+    # Create csi-hostpath-sc as default storage class
+    kubectl apply -f - <<EOF
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-hostpath-sc
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: hostpath.csi.k8s.io
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+EOF
+
     print_info "Kind cluster created successfully!"
 }
 

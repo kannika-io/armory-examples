@@ -31,8 +31,7 @@ List available tutorials:
 ./setup kafka         # Set up Kafka clusters only
 ./setup tools         # Install kind, kubectl, helm to .bin
 ./setup list          # List available tutorials
-./teardown            # Delete Kind cluster only
-./teardown --all      # Delete Kind cluster and stop Kafka
+./teardown            # Delete Kind cluster and stop Kafka
 ```
 
 ## Services

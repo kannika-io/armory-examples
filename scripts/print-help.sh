@@ -20,8 +20,7 @@ print_kafka_info() {
 
 print_teardown_info() {
     echo "Teardown:"
-    echo "  ./teardown.sh              # Kind cluster only"
-    echo "  ./teardown.sh --all        # Kind cluster and Kafka"
+    echo "  ./teardown"
 }
 
 print_next_steps_armory() {
