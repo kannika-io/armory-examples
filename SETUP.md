@@ -49,6 +49,7 @@ curl -fsSL https://raw.githubusercontent.com/kannika-io/armory-examples/main/ins
 ./setup <TUTORIAL>    # Run a tutorial (Armory + Kafka + tutorial resources)
 ./setup armory        # Set up Kannika Armory only (Kind + Helm)
 ./setup kafka         # Set up Kafka clusters only (docker-compose)
+./setup network       # Connect Kind cluster to Kafka network
 ./setup tools         # Install kind, kubectl, helm to .bin
 ./setup list          # List available tutorials
 ./teardown            # Delete Kind cluster and stop Kafka
@@ -92,6 +93,16 @@ Set up just the Kafka clusters:
 ```
 
 If a Kind cluster is detected, you'll be prompted to connect them.
+
+### Network Only
+
+Connect an existing Kind cluster to the Kafka network:
+
+```bash
+./setup network
+```
+
+This allows pods in the Kind cluster to access `kafka-source:29092` and `kafka-target:29092`.
 
 ## Services
 
@@ -234,7 +245,7 @@ docker network inspect kafka
 Reconnect if needed:
 
 ```bash
-./scripts/connect-kafka-to-kind.sh
+./setup network
 ```
 
 ### Missing Tools

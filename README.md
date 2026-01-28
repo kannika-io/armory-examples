@@ -29,6 +29,7 @@ List available tutorials:
 ./setup <tutorial>    # Run a tutorial (sets up everything)
 ./setup armory        # Set up Kannika Armory only
 ./setup kafka         # Set up Kafka clusters only
+./setup network       # Connect Kind cluster to Kafka network
 ./setup tools         # Install kind, kubectl, helm to .bin
 ./setup list          # List available tutorials
 ./teardown            # Delete Kind cluster and stop Kafka
