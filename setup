@@ -32,7 +32,8 @@ Run a Kannika Armory tutorial or set up individual components.
 COMMANDS:
     <tutorial>    Run the specified tutorial (sets up everything)
     armory        Set up Kannika Armory only (Kind cluster + Helm)
-    kafka         Set up Kafka clusters only (docker-compose + network)
+    kafka         Set up Kafka clusters only (docker-compose)
+    network       Connect Kind cluster to Kafka network
     tools         Install kind, kubectl, and helm to .bin directory
     list          List available tutorials
 
@@ -47,6 +48,7 @@ EOF
     echo "    ./setup migrate-consumer-groups"
     echo "    ./setup armory"
     echo "    ./setup kafka"
+    echo "    ./setup network"
     echo "    ./setup tools"
     echo "    ./setup list"
     echo ""
@@ -242,6 +244,9 @@ main() {
                     setup_network
                 fi
             fi
+            ;;
+        network)
+            setup_network
             ;;
         tools)
             setup_tools
