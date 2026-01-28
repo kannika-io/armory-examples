@@ -2,6 +2,10 @@
 
 set -e  # Exit on error
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/env.sh"
+__env_load
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -104,16 +108,17 @@ check_kafka_network() {
     print_info "Kafka network '${KAFKA_NETWORK}' found."
 }
 
-# Get Kind control plane container name
-get_kind_control_plane() {
-    local container_name="${CLUSTER_NAME}-control-plane"
+# Get all Kind cluster node containers
+get_kind_nodes() {
+    local nodes
+    nodes=$(docker ps --format '{{.Names}}' | grep -E "^${CLUSTER_NAME}-(control-plane|worker)" || true)
 
-    if ! docker ps --format '{{.Names}}' | grep -q "^${container_name}$"; then
-        print_error "Kind cluster '${CLUSTER_NAME}' not found. Create it with: ./setup-kannika-armory.sh"
+    if [ -z "$nodes" ]; then
+        print_error "Kind cluster '${CLUSTER_NAME}' not found. Create it with: ./setup armory"
         exit 1
     fi
 
-    echo "${container_name}"
+    echo "$nodes"
 }
 
 # Connect Kind cluster to Kafka network
@@ -159,21 +164,28 @@ verify_connection() {
 # Main function
 main() {
     parse_args "$@"
-    
+
     print_info "Connecting Kind cluster '${CLUSTER_NAME}' to Kafka network..."
     echo ""
-    
+
     check_docker
 
-    local container_name
-    container_name=$(get_kind_control_plane) || exit 1
-    print_info "Found Kind control plane: ${container_name}"
+    local nodes
+    nodes=$(get_kind_nodes) || exit 1
+    print_info "Found Kind nodes:"
+    echo "$nodes" | while read -r node; do echo "  - $node"; done
 
     check_kafka_network
-    
-    connect_to_network "${container_name}"
-    verify_connection "${container_name}"
-    
+
+    echo "$nodes" | while read -r node; do
+        connect_to_network "$node"
+    done
+
+    # Verify using the first node
+    local first_node
+    first_node=$(echo "$nodes" | head -1)
+    verify_connection "$first_node"
+
     echo ""
     print_info "========================================="
     print_info "Connection completed successfully!"
