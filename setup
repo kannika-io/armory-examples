@@ -6,7 +6,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TUTORIALS_DIR="${SCRIPT_DIR}/tutorials"
-CLUSTER_NAME="${CLUSTER_NAME:-${CLUSTER_NAME}}"
+CLUSTER_NAME="${CLUSTER_NAME:-kannika-kind}"
 
 source "${SCRIPT_DIR}/scripts/env.sh"
 source "${SCRIPT_DIR}/scripts/print-help.sh"

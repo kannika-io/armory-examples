@@ -16,6 +16,7 @@ __env_bin_dir() {
 __env_generate() {
     local env_file="$(__env_file)"
     cat > "${env_file}" << 'EOF'
+CLUSTER_NAME=kannika-kind
 ARMORY_CONSOLE_PORT=8080
 ARMORY_API_PORT=8081
 KAFKA_SOURCE_CONSOLE_PORT=8180
