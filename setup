@@ -85,12 +85,24 @@ setup_armory() {
     "${SCRIPT_DIR}/scripts/setup-kannika-armory.sh" "$@"
 }
 
+kafka_ready() {
+    docker exec kafka-source kafka-broker-api-versions --bootstrap-server localhost:9092 &>/dev/null && \
+    docker exec kafka-target kafka-broker-api-versions --bootstrap-server localhost:9093 &>/dev/null
+}
+
 setup_kafka() {
+    if kafka_ready; then
+        print_warning "Kafka clusters already running, skipping."
+        return 0
+    fi
+
     print_info "Starting Kafka clusters..."
     docker-compose -f "${SCRIPT_DIR}/docker-compose.yml" up -d
 
     print_info "Waiting for Kafka to be ready..."
-    sleep 10
+    until kafka_ready; do
+        sleep 2
+    done
 }
 
 setup_network() {
