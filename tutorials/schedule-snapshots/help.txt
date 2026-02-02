@@ -1,0 +1,9 @@
+Tutorial: Schedule Backup Snapshots
+
+Resources created:
+  - Topic: transactions (sample financial data) on kafka-source
+  - EventHub: prod-kafka
+  - Storage: prod-storage
+  - Backup: prod-backup
+
+Continue at: https://docs.kannika.io/tutorials/compliance/schedule-snapshots/

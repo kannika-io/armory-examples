@@ -1,0 +1,12 @@
+# Backup job that backs up the transactions topic
+apiVersion: kannika.io/v1alpha
+kind: Backup
+metadata:
+  name: prod-backup
+  namespace: kannika-data
+spec:
+  source: prod-kafka
+  sink: prod-storage
+  enabled: true
+  streams:
+    - topic: transactions
