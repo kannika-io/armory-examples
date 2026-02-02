@@ -1,3 +1,5 @@
+# CronJob that rotates backup storage daily at midnight.
+# Creates a new timestamped Storage, updates the Backup to use it, and re-enables the Backup.
 apiVersion: batch/v1
 kind: CronJob
 metadata:

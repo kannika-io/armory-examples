@@ -1,3 +1,5 @@
+# RBAC resources for the storage rotation CronJob.
+# Grants permissions to manage Backups, Storages, and watch StatefulSets.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
