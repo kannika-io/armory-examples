@@ -1,0 +1,9 @@
+# Storage for backup data
+apiVersion: kannika.io/v1alpha
+kind: Storage
+metadata:
+  name: prod-storage
+  namespace: kannika-data
+spec:
+  volume:
+    capacity: 1Gi

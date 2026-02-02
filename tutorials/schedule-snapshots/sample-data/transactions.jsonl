@@ -1,0 +1,5 @@
+{"key": "TXN-001", "value": {"id": "TXN-001", "timestamp": "2026-01-15T09:30:00Z", "account": "ACC-12345", "type": "DEBIT", "amount": 1500.00, "currency": "USD", "description": "Wire transfer"}}
+{"key": "TXN-002", "value": {"id": "TXN-002", "timestamp": "2026-01-15T10:15:00Z", "account": "ACC-12345", "type": "CREDIT", "amount": 3200.00, "currency": "USD", "description": "Payment received"}}
+{"key": "TXN-003", "value": {"id": "TXN-003", "timestamp": "2026-01-15T11:00:00Z", "account": "ACC-67890", "type": "DEBIT", "amount": 750.50, "currency": "USD", "description": "ACH payment"}}
+{"key": "TXN-004", "value": {"id": "TXN-004", "timestamp": "2026-01-15T14:30:00Z", "account": "ACC-12345", "type": "DEBIT", "amount": 2100.00, "currency": "USD", "description": "Vendor payment"}}
+{"key": "TXN-005", "value": {"id": "TXN-005", "timestamp": "2026-01-15T16:45:00Z", "account": "ACC-67890", "type": "CREDIT", "amount": 5000.00, "currency": "USD", "description": "Client deposit"}}

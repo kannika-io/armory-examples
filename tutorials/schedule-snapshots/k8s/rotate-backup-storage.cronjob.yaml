@@ -1,0 +1,87 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: rotate-backup-storage
+  namespace: kannika-data
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: backup-storage-rotate-sa
+          restartPolicy: OnFailure
+          containers:
+          - name: rotate
+            image: alpine:3
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+
+              # Install kubectl
+              wget -qO /usr/local/bin/kubectl \
+                "https://dl.k8s.io/release/$(wget -qO- https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+              chmod +x /usr/local/bin/kubectl
+
+              BACKUP_NAME="prod-backup"
+              NAMESPACE="kannika-data"
+              TIMESTAMP=$(date +%Y%m%d%H%M%S)
+
+              echo "Starting storage rotation at ${TIMESTAMP}"
+
+              # Step 1: Disable the backup to flush segments
+              echo "Disabling backup..."
+              kubectl patch backup ${BACKUP_NAME} -n ${NAMESPACE} \
+                --type merge \
+                -p '{"spec":{"enabled":false}}'
+
+              # Wait for backup StatefulSet to scale down
+              echo "Waiting for backup to stop..."
+              kubectl wait statefulset -l io.kannika/backup=${BACKUP_NAME} -n ${NAMESPACE} \
+                --for=jsonpath='{.status.replicas}'=0 \
+                --timeout=60s
+
+              # Step 2: Get current storage configuration
+              CURRENT_STORAGE=$(kubectl get backup ${BACKUP_NAME} -n ${NAMESPACE} \
+                -o jsonpath='{.spec.sink}')
+              echo "Current storage: ${CURRENT_STORAGE}"
+
+              # Extract base name (remove any existing timestamp suffix)
+              BASE_NAME=$(echo ${CURRENT_STORAGE} | sed 's/-[0-9]\{14\}$//')
+              NEW_STORAGE_NAME="${BASE_NAME}-${TIMESTAMP}"
+
+              echo "New storage name: ${NEW_STORAGE_NAME}"
+
+              # Step 3: Create new storage with timestamp
+              # Extract the spec from current storage
+              VOLUME_CAPACITY=$(kubectl get storage ${CURRENT_STORAGE} -n ${NAMESPACE} \
+                -o jsonpath='{.spec.volume.capacity}')
+
+              echo "Creating new storage..."
+              cat <<EOF | kubectl apply -f -
+              apiVersion: kannika.io/v1alpha
+              kind: Storage
+              metadata:
+                name: ${NEW_STORAGE_NAME}
+                namespace: ${NAMESPACE}
+              spec:
+                volume:
+                  capacity: ${VOLUME_CAPACITY}
+              EOF
+
+              # Step 4: Update backup to use new storage
+              echo "Updating backup to use new storage..."
+              kubectl patch backup ${BACKUP_NAME} -n ${NAMESPACE} \
+                --type merge \
+                -p "{\"spec\":{\"sink\":\"${NEW_STORAGE_NAME}\"}}"
+
+              # Step 5: Re-enable the backup
+              echo "Re-enabling backup..."
+              kubectl patch backup ${BACKUP_NAME} -n ${NAMESPACE} \
+                --type merge \
+                -p '{"spec":{"enabled":true}}'
+
+              echo "Storage rotation complete"
+              echo "New storage: ${NEW_STORAGE_NAME}"
