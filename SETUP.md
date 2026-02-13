@@ -81,7 +81,7 @@ Set up just Kannika Armory without Kafka:
 Options can be passed through:
 
 ```bash
-./setup armory --version 0.13.0 --license /path/to/license.key
+./setup armory --version 0.14.0 --license /path/to/license.key
 ```
 
 ### Kafka Only
@@ -124,7 +124,7 @@ After setup, services are available at:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CLUSTER_NAME` | `kannika-kind` | Kind cluster name |
-| `KANNIKA_VERSION` | `0.13.0` | Kannika version to install |
+| `KANNIKA_VERSION` | `0.14.0` | Kannika version to install |
 | `KANNIKA_SYSTEM_NS` | `kannika-system` | System namespace |
 | `KANNIKA_DATA_NS` | `kannika-data` | Data namespace |
 | `LICENSE_PATH` | - | Path to license file |
@@ -134,7 +134,7 @@ After setup, services are available at:
 When running `./setup armory`, you can pass options:
 
 ```bash
-./setup armory --cluster my-cluster --version 0.13.0
+./setup armory --cluster my-cluster --version 0.14.0
 ./setup armory --license /path/to/license.key
 ./setup armory --namespace kannika-system --data-namespace kannika-data
 ```

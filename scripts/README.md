@@ -13,7 +13,7 @@ Main setup script that creates a Kind cluster and installs Kannika Armory.
 ./scripts/setup-kannika-armory.sh
 
 # With options
-./scripts/setup-kannika-armory.sh --cluster my-cluster --version 0.13.0
+./scripts/setup-kannika-armory.sh --cluster my-cluster --version 0.14.0
 
 # With license
 ./scripts/setup-kannika-armory.sh --license /path/to/license.key
@@ -23,7 +23,7 @@ Main setup script that creates a Kind cluster and installs Kannika Armory.
 | Option | Environment Variable | Default | Description |
 |--------|---------------------|---------|-------------|
 | `-c, --cluster` | `CLUSTER_NAME` | `kannika-kind` | Kind cluster name |
-| `-v, --version` | `KANNIKA_VERSION` | `0.13.0` | Kannika version |
+| `-v, --version` | `KANNIKA_VERSION` | `0.14.0` | Kannika version |
 | `-n, --namespace` | `KANNIKA_SYSTEM_NS` | `kannika-system` | System namespace |
 | `-d, --data-namespace` | `KANNIKA_DATA_NS` | `kannika-data` | Data namespace |
 | `-l, --license` | `LICENSE_PATH` | - | Path to license file |

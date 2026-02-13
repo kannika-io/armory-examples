@@ -10,7 +10,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 CLUSTER_NAME="${CLUSTER_NAME:-kannika-kind}"
-KANNIKA_VERSION="${KANNIKA_VERSION:-0.13.0}"
+KANNIKA_VERSION="${KANNIKA_VERSION:-0.14.0}"
 KANNIKA_SYSTEM_NS="${KANNIKA_SYSTEM_NS:-kannika-system}"
 KANNIKA_DATA_NS="${KANNIKA_DATA_NS:-kannika-data}"
 LICENSE_PATH="${LICENSE_PATH:-}"
@@ -268,7 +268,7 @@ Setup Kannika Armory on a kind cluster.
 OPTIONS:
     -h, --help                 Show this help message
     -c, --cluster NAME         Kind cluster name (default: kannika-kind)
-    -v, --version VERSION      Kannika version to install (default: 0.13.0)
+    -v, --version VERSION      Kannika version to install (default: 0.14.0)
     -n, --namespace NS         Kubernetes namespace for Kannika system (default: kannika-system)
     -d, --data-namespace NS    Kubernetes namespace for Kannika data resources (optional)
     -l, --license PATH         Path to license file (optional)
@@ -285,7 +285,7 @@ EXAMPLES:
     $0
 
     # Custom cluster name and version
-    $0 --cluster my-cluster --version 0.13.0
+    $0 --cluster my-cluster --version 0.14.0
 
     # With data namespace
     $0 --data-namespace kannika-data
