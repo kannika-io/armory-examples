@@ -32,7 +32,7 @@ Run a Kannika Armory tutorial or set up individual components.
 COMMANDS:
     <tutorial>    Run the specified tutorial (sets up everything)
     armory        Set up Kannika Armory only (Kind cluster + Helm)
-    kafka         Set up Kafka clusters only (docker-compose)
+    kafka         Set up Kafka clusters only (docker compose)
     network       Connect Kind cluster to Kafka network
     tools         Install kind, kubectl, and helm to .bin directory
     list          List available tutorials
@@ -100,7 +100,7 @@ setup_kafka() {
     fi
 
     print_info "Starting Kafka clusters..."
-    docker-compose -f "${SCRIPT_DIR}/docker-compose.yml" up -d
+    docker compose -f "${SCRIPT_DIR}/docker-compose.yml" up -d
 
     print_info "Waiting for Kafka to be ready..."
     until kafka_ready; do
@@ -111,6 +111,62 @@ setup_kafka() {
 setup_network() {
     print_info "Connecting Kind to Kafka network..."
     "${SCRIPT_DIR}/scripts/connect-kafka-to-kind.sh"
+}
+
+connect_kind_to_network() {
+    local network="$1"
+
+    if ! docker network inspect "${network}" >/dev/null 2>&1; then
+        return 0
+    fi
+
+    local nodes
+    nodes=$(docker ps --format '{{.Names}}' | grep -E "^${CLUSTER_NAME}-(control-plane|worker)" || true)
+    [ -z "$nodes" ] && return 0
+
+    echo "$nodes" | while read -r node; do
+        local networks
+        networks=$(docker inspect "${node}" --format '{{range $net, $v := .NetworkSettings.Networks}}{{$net}} {{end}}')
+        if echo "${networks}" | grep -q "${network}"; then
+            print_warning "Container '${node}' already connected to '${network}'."
+        else
+            print_info "Connecting '${node}' to network '${network}'..."
+            docker network connect "${network}" "${node}"
+        fi
+    done
+}
+
+setup_tutorial_compose() {
+    local tutorial="$1"
+    local tutorial_dir="${TUTORIALS_DIR}/${tutorial}"
+    local compose_file="${tutorial_dir}/docker compose.yml"
+
+    if [ ! -f "$compose_file" ]; then
+        return 0
+    fi
+
+    print_info "Starting tutorial services..."
+    docker compose -f "$compose_file" up -d
+
+    # Wait for healthy services (skip containers that already exited successfully)
+    print_info "Waiting for tutorial services to be ready..."
+    until docker compose -f "$compose_file" ps | grep -q "(healthy)"; do
+        sleep 2
+    done
+
+    # Connect Kind nodes to any networks defined in the compose file
+    local networks
+    networks=$(docker compose -f "$compose_file" config \
+        --format json 2>/dev/null | grep -o '"name":"[^"]*"' | cut -d'"' -f4 || true)
+
+    if [ -z "$networks" ]; then
+        # Fallback: extract network names from compose file directly
+        networks=$(awk '/^networks:/,/^[^ ]/{if(/name:/) print $2}' "$compose_file")
+    fi
+
+    for network in $networks; do
+        connect_kind_to_network "$network"
+    done
 }
 
 run_tutorial_init() {
@@ -196,6 +252,7 @@ run_tutorial() {
     setup_armory "$@"
     setup_kafka
     setup_network
+    setup_tutorial_compose "$tutorial"
     run_tutorial_init "$tutorial"
     apply_tutorial_k8s "$tutorial"
     print_help "$tutorial"

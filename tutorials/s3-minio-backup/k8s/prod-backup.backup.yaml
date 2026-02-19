@@ -1,0 +1,15 @@
+# Backup job that backs up the orders topic to MinIO S3 storage
+apiVersion: kannika.io/v1alpha
+kind: Backup
+metadata:
+  name: prod-backup
+  namespace: kannika-data
+spec:
+  source: prod-kafka
+  sink: s3-minio
+  sinkCredentialsFrom:
+    credentialsRef:
+      name: s3-minio-creds
+  enabled: true
+  streams:
+    - topic: orders

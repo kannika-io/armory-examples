@@ -1,0 +1,11 @@
+# S3 Storage pointing to MinIO
+apiVersion: kannika.io/v1alpha
+kind: Storage
+metadata:
+  name: s3-minio
+  namespace: kannika-data
+spec:
+  s3:
+    bucket: kannika-backup
+    endpoint: http://minio:9000
+    forcePathStyle: true

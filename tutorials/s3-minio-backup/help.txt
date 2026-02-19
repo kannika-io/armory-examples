@@ -1,0 +1,14 @@
+Tutorial: Backup with S3 Storage (MinIO)
+
+Resources created:
+  - Topic: orders (sample e-commerce data) on kafka-source
+  - EventHub: prod-kafka
+  - Storage: s3-minio → minio:9000/kannika-backup
+  - Credentials: s3-minio-creds
+  - Backup: prod-backup
+
+MinIO:
+  - S3 API: http://localhost:9000
+  - Console: http://localhost:9001 (minioadmin / minioadmin)
+
+Continue at: https://docs.kannika.io/tutorials/disaster-recovery/backup-with-s3-storage/

@@ -97,7 +97,7 @@ install_csi_hostpath_driver() {
     print_info "Installing CSI hostpath driver..."
     kubectl apply -f "${REPO_ROOT}/resources/csi-hostpath/"
     print_info "Waiting for CSI hostpath driver to be ready..."
-    kubectl rollout status statefulset/csi-hostpathplugin -n default --timeout=120s
+    kubectl rollout status statefulset/csi-hostpathplugin -n default --timeout=600s
 
     # Remove default annotation from standard storage class
     kubectl patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
