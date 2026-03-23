@@ -1,0 +1,20 @@
+console:
+  config:
+    security:
+      enabled: true
+      oidc:
+        enabled: true
+        clientId: kannika-armory
+        scope: openid profile email
+        authEndpoint: http://keycloak:8280/realms/kannika/protocol/openid-connect/auth
+        tokenEndpoint: http://keycloak:8280/realms/kannika/protocol/openid-connect/token
+        logoutEndpoint: http://keycloak:8280/realms/kannika/protocol/openid-connect/logout
+        displayNameTokenClaim: name
+api:
+  config:
+    security:
+      enabled: true
+      oidc:
+        issuerUri: http://keycloak:8280/realms/kannika
+        audience: kannika-armory
+        principalClaimName: email

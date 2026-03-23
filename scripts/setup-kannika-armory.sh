@@ -10,10 +10,11 @@ NC='\033[0m' # No Color
 
 # Configuration
 CLUSTER_NAME="${CLUSTER_NAME:-kannika-kind}"
-KANNIKA_VERSION="${KANNIKA_VERSION:-0.14.1}"
+KANNIKA_VERSION="${KANNIKA_VERSION:-0.15.0}"
 KANNIKA_SYSTEM_NS="${KANNIKA_SYSTEM_NS:-kannika-system}"
 KANNIKA_DATA_NS="${KANNIKA_DATA_NS:-kannika-data}"
 LICENSE_PATH="${LICENSE_PATH:-}"
+HELM_VALUES_FILE="${HELM_VALUES_FILE:-}"
 
 # Print colored message
 print_info() {
@@ -35,6 +36,15 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 source "${SCRIPT_DIR}/env.sh"
 __env_load
 
+
+# Run a lifecycle hook if it exists in HOOKS_DIR
+run_hook() {
+    local hook_name="$1"
+    if [ -n "${HOOKS_DIR}" ] && [ -f "${HOOKS_DIR}/${hook_name}.sh" ]; then
+        print_info "Running ${hook_name} hook..."
+        source "${HOOKS_DIR}/${hook_name}.sh"
+    fi
+}
 
 # Check if a command exists
 command_exists() {
@@ -208,12 +218,18 @@ create_license_secret() {
 install_kannika_armory() {
     print_info "Installing Kannika Armory (version ${KANNIKA_VERSION})..."
 
-    helm install kannika oci://quay.io/kannika/charts/kannika \
-        --namespace "${KANNIKA_SYSTEM_NS}" \
-        --version "${KANNIKA_VERSION}" \
-        --set global.kubernetes.namespace="${KANNIKA_DATA_NS}" \
-        --set console.config.apiUrl="http://localhost:8081" \
-        --wait
+    local helm_cmd=(helm install kannika oci://quay.io/kannika/charts/kannika
+        --namespace "${KANNIKA_SYSTEM_NS}"
+        --version "${KANNIKA_VERSION}"
+        --set global.kubernetes.namespace="${KANNIKA_DATA_NS}"
+        --set console.config.apiUrl="http://localhost:8081"
+        --wait)
+
+    if [ -n "${HELM_VALUES_FILE}" ]; then
+        helm_cmd+=(-f "${HELM_VALUES_FILE}")
+    fi
+
+    "${helm_cmd[@]}"
 
     print_info "Kannika Armory installed successfully!"
 }
@@ -272,6 +288,7 @@ OPTIONS:
     -n, --namespace NS         Kubernetes namespace for Kannika system (default: kannika-system)
     -d, --data-namespace NS    Kubernetes namespace for Kannika data resources (optional)
     -l, --license PATH         Path to license file (optional)
+    -f, --values FILE          Additional Helm values file (optional)
 
 ENVIRONMENT VARIABLES:
     CLUSTER_NAME               Same as --cluster
@@ -279,6 +296,7 @@ ENVIRONMENT VARIABLES:
     KANNIKA_SYSTEM_NS          Same as --namespace
     KANNIKA_DATA_NS            Same as --data-namespace
     LICENSE_PATH               Same as --license
+    HELM_VALUES_FILE           Same as --values
 
 EXAMPLES:
     # Basic installation
@@ -347,6 +365,14 @@ parse_args() {
                 KANNIKA_DATA_NS="$2"
                 shift 2
                 ;;
+            -f|--values)
+                if [ -z "$2" ] || [[ "$2" == -* ]]; then
+                    print_error "Option --values requires a value"
+                    exit 1
+                fi
+                HELM_VALUES_FILE="$2"
+                shift 2
+                ;;
             *)
                 print_error "Unknown option: $1"
                 usage
@@ -371,16 +397,22 @@ main() {
     echo "  License path: ${LICENSE_PATH:-<not provided>}"
     echo ""
 
+    run_hook "pre-setup"
     check_prerequisites
+    run_hook "pre-cluster"
     create_kind_cluster
+    run_hook "post-cluster"
     install_kannika_crds
     create_kannika_namespace
     create_kannika_data_namespace
     set_default_namespace
     create_license_secret
+    run_hook "pre-install"
     install_kannika_armory
+    run_hook "post-install"
     expose_services
     verify_installation
+    run_hook "post-setup"
 
     echo ""
     print_info "Kannika Armory setup completed!"

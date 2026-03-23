@@ -1,0 +1,10 @@
+Tutorial: Authenticate with OIDC
+
+Keycloak:
+  Admin Console: http://keycloak:8280
+  Admin user:    admin / admin
+
+  Realm:         kannika
+  Test user:     demo / demo
+
+Continue at: https://docs.kannika.io/tutorials/security/auth-oidc/
