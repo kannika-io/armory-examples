@@ -79,7 +79,7 @@ setup_tools() {
     print_info "Tools installed to $(__env_bin_dir)"
 }
 
-setup_armory() {
+install_armory() {
     if kind get clusters 2>/dev/null | grep -q "^${CLUSTER_NAME}$"; then
         print_warning "Cluster '${CLUSTER_NAME}' already exists, skipping armory setup."
         return 0
@@ -113,27 +113,10 @@ setup_network() {
     "${SCRIPT_DIR}/scripts/connect-kafka-to-kind.sh"
 }
 
-run_tutorial_init() {
-    local tutorial="$1"
-    local tutorial_dir="${TUTORIALS_DIR}/${tutorial}"
-    local init_file="${tutorial_dir}/init.sh"
-
-    if [ ! -f "$init_file" ]; then
-        return 0
-    fi
-
-    if [ ! -x "$init_file" ]; then
-        chmod +x "$init_file"
-    fi
-
-    print_info "Initializing tutorial resources..."
-    "$init_file"
-}
-
 apply_tutorial_k8s() {
     local tutorial="$1"
     local tutorial_dir="${TUTORIALS_DIR}/${tutorial}"
-    local k8s_dir="${tutorial_dir}/k8s"
+    local k8s_dir="${TUTORIAL_DIR}/k8s"
 
     if [ ! -d "$k8s_dir" ]; then
         return 0
@@ -162,10 +145,10 @@ print_help() {
     echo ""
 
     # Print tutorial-specific help if exists
-    if [ -f "${tutorial_dir}/help.txt" ]; then
+    if [ -f "${TUTORIAL_DIR}/help.txt" ]; then
         echo "----------------------------------------------"
         echo ""
-        cat "${tutorial_dir}/help.txt"
+        cat "${TUTORIAL_DIR}/help.txt"
     fi
 
     echo ""
@@ -178,9 +161,10 @@ print_help() {
 run_tutorial() {
     local tutorial="$1"
     shift
-    local tutorial_dir="${TUTORIALS_DIR}/${tutorial}"
+    export TUTORIAL_DIR="${TUTORIALS_DIR}/${tutorial}"
+    export HOOKS_DIR="${TUTORIAL_DIR}"
 
-    if [ ! -d "$tutorial_dir" ]; then
+    if [ ! -d "$TUTORIAL_DIR" ]; then
         print_error "Tutorial not found: ${tutorial}"
         echo ""
         echo "Available tutorials:"
@@ -193,10 +177,13 @@ run_tutorial() {
     echo "=============================================="
     echo ""
 
-    setup_armory "$@"
+    if [ -f "${TUTORIAL_DIR}/values.yaml" ]; then
+        install_armory --values "${TUTORIAL_DIR}/values.yaml" "$@"
+    else
+        install_armory "$@"
+    fi
     setup_kafka
     setup_network
-    run_tutorial_init "$tutorial"
     apply_tutorial_k8s "$tutorial"
     print_help "$tutorial"
 }
@@ -230,7 +217,7 @@ main() {
                 # User confirmed, run directly bypassing skip check
                 "${SCRIPT_DIR}/scripts/setup-kannika-armory.sh" "$@"
             else
-                setup_armory "$@"
+                install_armory "$@"
             fi
             ;;
         kafka)
