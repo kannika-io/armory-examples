@@ -59,11 +59,20 @@ Create a new directory under `tutorials/`. The directory name is the tutorial na
 
 ```
 tutorials/my-tutorial/           # Run with: ./setup my-tutorial
-├── init.sh      # Setup script (optional, must be executable)
-├── help.txt     # Printed after setup completes (optional)
-├── README.md    # First line used as description in ./setup list (optional)
-└── k8s/         # Kubernetes resources applied automatically (optional)
+├── README.md        # First line used as description in ./setup list
+├── help.txt         # Printed after setup completes
+├── values.yaml      # Helm values merged into Armory install
+├── k8s/             # Kubernetes resources applied automatically
+├── pre-setup.sh     # Hook: before anything starts
+├── pre-cluster.sh   # Hook: before Kind cluster creation
+├── post-cluster.sh  # Hook: after Kind cluster creation
+├── pre-install.sh   # Hook: before Armory Helm install
+├── post-install.sh  # Hook: after Armory install and k8s/ resources applied
+├── post-setup.sh    # Hook: after everything completes
+└── teardown.sh      # Hook: run by ./teardown <tutorial>
 ```
+
+All files are optional. Hook scripts must be executable.
 
 ## Resources
 

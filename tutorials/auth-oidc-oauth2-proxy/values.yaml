@@ -1,0 +1,8 @@
+console:
+  config:
+    security:
+      enabled: false
+api:
+  config:
+    security:
+      enabled: false

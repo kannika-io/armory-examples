@@ -1,0 +1,16 @@
+Tutorial: Authenticate with oauth2-proxy (Client Secret)
+
+Keycloak:
+  Admin Console: http://keycloak:8280
+  Admin user:    admin / admin
+
+  Realm:         kannika
+  Test user:     demo / demo
+
+oauth2-proxy:
+  URL:           http://localhost:4180
+  Client ID:     kannika-armory-proxy
+  Flow:          Authorization Code (client secret, no PKCE)
+
+Access the Armory console through oauth2-proxy at http://localhost:4180
+
