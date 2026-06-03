@@ -1,0 +1,2 @@
+Gateway API — Expose Armory via Kubernetes Gateway API with Envoy Gateway
+Docs: https://docs.kannika.io/installation/configuration/networking/#gateway-api
