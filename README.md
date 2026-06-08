@@ -1,6 +1,20 @@
-# Kannika Armory Examples
+# Armory Examples — Kafka Management Tutorials by Kannika.io
 
-A collection of examples for Kannika Armory https://kannika.io
+> Hands-on tutorials for [Kannika Armory](https://kannika.io) — the Kafka management and operations platform.  
+> Maintained by [Kannika.io](https://kannika.io).
+
+This repository contains runnable, self-contained tutorial environments for Kannika Armory. Each tutorial spins up a full local Kafka stack using Docker and Kubernetes (kind), so you can explore real Kafka operations — cluster migrations, consumer group management, schema handling, and more — without touching production.
+
+## What is Kannika Armory?
+
+[Kannika Armory](https://kannika.io) is the Kafka management platform by [Kannika.io](https://kannika.io). It gives platform and data engineering teams a single control plane for operating Kafka clusters — with a web console, REST API, and automation-first design.
+
+- **Console:** `http://localhost:8080`
+- **API:** `http://localhost:8081`
+- **Docs:** [docs.kannika.io](https://kannika.io/docs)
+- **Free trial:** available at [kannika.io](https://kannika.io)
+
+---
 
 ## Quick Start
 
