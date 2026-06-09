@@ -1,13 +1,15 @@
-# Armory Examples — Kafka Management Tutorials by Kannika.io
+# Armory Examples - Tutorials by Kannika.io
 
-> Hands-on tutorials for [Kannika Armory](https://kannika.io) — the Kafka management and operations platform.  
+> Hands-on tutorials for [Kannika Armory](https://kannika.io), a backup, restore, and disaster recovery solution for Apache Kafka.
 > Maintained by [Kannika.io](https://kannika.io).
 
-This repository contains runnable, self-contained tutorial environments for Kannika Armory. Each tutorial spins up a full local Kafka stack using Docker and Kubernetes (kind), so you can explore real Kafka operations — cluster migrations, consumer group management, schema handling, and more — without touching production.
+This repository contains runnable, self-contained tutorial environments for Kannika Armory.
+Each tutorial spins up a full local Kafka stack using Docker and Kubernetes (kind), so you can explore real Kafka operations (cluster migrations, consumer group management, schema handling, and more) without touching production.
 
 ## What is Kannika Armory?
 
-[Kannika Armory](https://kannika.io) is the Kafka management platform by [Kannika.io](https://kannika.io). It gives platform and data engineering teams a single control plane for operating Kafka clusters — with a web console, REST API, and automation-first design.
+[Kannika Armory](https://kannika.io) provides business continuity, compliance, and data resilience for organisations running Apache Kafka, without writing a single line of custom code.
+It delivers automated backups, point-in-time recovery, environment cloning, and seamless migration, all managed through a web console, REST API, or Kubernetes configurations.
 
 - **Console:** `http://localhost:8080`
 - **API:** `http://localhost:8081`
@@ -86,7 +88,8 @@ tutorials/my-tutorial/           # Run with: ./setup my-tutorial
 └── teardown.sh      # Hook: run by ./teardown <tutorial>
 ```
 
-All files are optional. Hook scripts must be executable.
+All files are optional.
+Hook scripts must be executable.
 
 ## Resources
 
@@ -96,4 +99,5 @@ All files are optional. Hook scripts must be executable.
 
 ## Community
 
-Questions or feedback? Join us on [Slack](https://kannika-io.slack.com/) or get in touch at [hello@kannika.io](mailto:hello@kannika.io).
+Questions or feedback?
+Join us on [Slack](https://kannika-io.slack.com/) or get in touch at [hello@kannika.io](mailto:hello@kannika.io).
